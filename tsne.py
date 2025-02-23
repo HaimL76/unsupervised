@@ -17,7 +17,9 @@ def plot_tsne(csv_file, target_column=None):
         col = df[col_name]
         df[col_name] = encoder.fit_transform(col)
 
-    exit(0)
+    target_column = 'Mood Score'
+    target_column = 'Productivity Score'
+    #target_column = 'Stress'
 
     # If target_column is provided, extract labels
     if target_column and target_column in df.columns:
@@ -44,15 +46,29 @@ def plot_tsne(csv_file, target_column=None):
     else:
         plt.scatter(tsne_results[:, 0], tsne_results[:, 1], alpha=0.7)
 
+    length = len(tsne_results)
+
+    for index in range(length):
+        tsne1 = tsne_results[index, 0]
+        tsne2 = tsne_results[index, 1]
+
+        ##plt.text(tsne1, tsne2, str(index), fontsize=8, ha='right', va='bottom', color='red')
+
     plt.title('t-SNE Visualization')
     plt.xlabel('t-SNE Component 1')
     plt.ylabel('t-SNE Component 2')
     plt.show()
 
 # Example usage:
-filepath: str = r"c:\ds\sleep_deprivation_dataset_detailed.csv"
+arr_files: list = [
+    r'ds\sleep_deprivation_dataset_detailed.csv',
+    r'ds\Bank_Transaction_Fraud_Detection.csv',
+    r'ds\sales_data.csv',
+    r'ds\sleep_cycle_productivity.csv',
+    r'ds\car_price_dataset.csv',
+    r'ds\schizophrenia_dataset.csv'
+]
 
-##filepath = r"c:\ds\Bank_Transaction_Fraud_Detection.csv"
-##filepath = r"c:\ds\Bank_Transaction_Fraud_Detection.csv"
+file_path: str = arr_files[-1]
 
-plot_tsne(filepath, target_column="category")
+plot_tsne(file_path, target_column="category")
