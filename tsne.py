@@ -1,13 +1,24 @@
+import os.path
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 
+from utils import replace_extension, csv_to_dict
+
 
 def plot_tsne(csv_file, target_column=None):
     # Load data
     df = pd.read_csv(csv_file)
+
+    trans_file = replace_extension(csv_file, '.trans')
+
+    if os.path.exists(trans_file):
+        column_map: dict = csv_to_dict(trans_file)
+
+        df.rename(columns=column_map, inplace=True)
 
     encoder = LabelEncoder()
 

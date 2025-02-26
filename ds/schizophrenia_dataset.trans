@@ -1,0 +1,21 @@
+Original Word,Translated Word
+Hasta_ID,Patient_ID
+Yaş,Age
+Cinsiyet,Gender
+Eğitim_Seviyesi,Education_Level
+Medeni_Durum,Marital_Status
+Meslek,Occupation
+Gelir_Düzeyi,Income_Level
+Yaşadığı_Yer,Place_of_Residence
+Tanı,Diagnosis
+Hastalık_Süresi,Disease_Duration
+Hastaneye_Yatış_Sayısı,Number_of_Hospitalizations
+Ailede_Şizofreni_Öyküsü,Family_History_of_Schizophrenia
+Madde_Kullanımı,Substance_Use
+İntihar_Girişimi,Suicide_Attempt
+Pozitif_Semptom_Skoru,Positive_Symptom_Score
+Negatif_Semptom_Skoru,Negative_Symptom_Score
+GAF_Skoru,GAF_Score
+Sosyal_Destek,Social_Support
+Stres_Faktörleri,Stress_Factors
+İlaç_Uyumu,Medication_Adherence
