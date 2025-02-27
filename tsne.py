@@ -20,6 +20,8 @@ def plot_tsne(csv_file, target_column=None):
 
         df.rename(columns=column_map, inplace=True)
 
+    target_column = 'Diagnosis'
+
     encoder = LabelEncoder()
 
     column_names = df.keys()
@@ -27,10 +29,6 @@ def plot_tsne(csv_file, target_column=None):
     for col_name in column_names:
         col = df[col_name]
         df[col_name] = encoder.fit_transform(col)
-
-    target_column = 'Mood Score'
-    target_column = 'Productivity Score'
-    #target_column = 'Stress'
 
     # If target_column is provided, extract labels
     if target_column and target_column in df.columns:
