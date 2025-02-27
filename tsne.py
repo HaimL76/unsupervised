@@ -6,10 +6,11 @@ import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 
-from utils import replace_extension, csv_to_dict
+from utils import replace_extension, csv_to_dict, k_means
 
 
 def plot_tsne(csv_file, target_column=None):
+    k_means(11)
     # Load data
     df = pd.read_csv(csv_file)
 
