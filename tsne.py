@@ -45,7 +45,9 @@ def plot_tsne(csv_file, target_column=None):
     tsne = TSNE(n_components=2, random_state=42)
     tsne_results = tsne.fit_transform(df_scaled)
 
-    my_k_means(np.asarray(tsne_results, dtype=float))
+    arr = np.asarray(tsne_results, dtype=float)
+
+    clusters = my_k_means(arr, k = 12)
 
     # Plot results
     plt.figure(figsize=(8, 6))
@@ -64,6 +66,12 @@ def plot_tsne(csv_file, target_column=None):
         tsne2 = tsne_results[index, 1]
 
         ##plt.text(tsne1, tsne2, str(index), fontsize=8, ha='right', va='bottom', color='red')
+
+    for cluster in clusters:
+        hull_points = cluster[1]
+        # Plot polygon
+        plt.plot(hull_points[:, 0], hull_points[:, 1], 'b-', linewidth=2)  # , label='Polygon')
+        ##plt.fill(hull_points[:, 0], hull_points[:, 1], color='skyblue', alpha=0.4)  # Optional fill
 
     plt.title('t-SNE Visualization')
     plt.xlabel('t-SNE Component 1')

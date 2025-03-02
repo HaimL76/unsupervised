@@ -10,11 +10,11 @@ from sklearn.cluster import k_means
 from convex_hull import calculate_convex_hull
 
 
-def my_k_means(arr: np.ndarray, k = 3):
+def my_k_means(points: np.ndarray, k = 3):
     # Apply K-Means
       # Number of clusters
     kmeans = KMeans(n_clusters=k, random_state=0, n_init=10)
-    kmeans.fit(arr)
+    kmeans.fit(points)
 
     # Get cluster labels and centroids
     labels = kmeans.labels_
@@ -22,8 +22,8 @@ def my_k_means(arr: np.ndarray, k = 3):
 
     list_clusters = [None] * len(centroids)
 
-    for index in range(len(arr)):
-        coords = arr[index]
+    for index in range(len(points)):
+        coords = points[index]
         label = labels[index]
 
         tup = list_clusters[label]
@@ -48,12 +48,13 @@ def my_k_means(arr: np.ndarray, k = 3):
         # Compute Convex Hull
         cluster[1] = np.asarray(calculate_convex_hull(list_coords), dtype=float)
 
+    return list_clusters
 
     for cluster in list_clusters:
-        points = cluster[1]
+        hull_points = cluster[1]
         # Plot polygon
-        plt.plot(points[:, 0], points[:, 1], 'b-', linewidth=2)#, label='Polygon')
-        plt.fill(points[:, 0], points[:, 1], color='skyblue', alpha=0.4)  # Optional fill
+        plt.plot(hull_points[:, 0], hull_points[:, 1], 'b-', linewidth=2)#, label='Polygon')
+        plt.fill(hull_points[:, 0], hull_points[:, 1], color='skyblue', alpha=0.4)  # Optional fill
 
         # Plot points
         #plt.scatter(points[:, 0], points[:, 1], color='darkgreen', zorder=3)
