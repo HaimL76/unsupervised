@@ -22,8 +22,8 @@ def my_k_means(arr: np.ndarray, k = 3):
 
     list_clusters = [None] * len(centroids)
 
-    for index in range(len(X)):
-        coords = X[index]
+    for index in range(len(arr)):
+        coords = arr[index]
         label = labels[index]
 
         tup = list_clusters[label]
@@ -59,7 +59,7 @@ def my_k_means(arr: np.ndarray, k = 3):
         #plt.scatter(points[:, 0], points[:, 1], color='darkgreen', zorder=3)
 
     # Plot results
-    plt.scatter(X[:, 0], X[:, 1], c=labels, cmap='viridis', alpha=0.6)
+    plt.scatter(points[:, 0], points[:, 1], c=labels, cmap='viridis', alpha=0.6)
     plt.scatter(centroids[:, 0], centroids[:, 1], c='red', marker='X', s=200, label="Centroids")
     plt.legend()
     plt.show()

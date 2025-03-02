@@ -45,6 +45,8 @@ def plot_tsne(csv_file, target_column=None):
     tsne = TSNE(n_components=2, random_state=42)
     tsne_results = tsne.fit_transform(df_scaled)
 
+    my_k_means(np.asarray(tsne_results, dtype=float))
+
     # Plot results
     plt.figure(figsize=(8, 6))
     if labels is not None:
