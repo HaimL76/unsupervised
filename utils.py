@@ -7,15 +7,14 @@ from sklearn.cluster import KMeans
 from scipy.spatial import ConvexHull
 from sklearn.cluster import k_means
 
-def my_k_means(k = 3):
-    # Generate sample data
-    np.random.seed(0)
-    X = np.random.rand(100, 2) * 10  # 100 points in 2D space
+from convex_hull import calculate_convex_hull
 
+
+def my_k_means(arr: np.ndarray, k = 3):
     # Apply K-Means
       # Number of clusters
     kmeans = KMeans(n_clusters=k, random_state=0, n_init=10)
-    kmeans.fit(X)
+    kmeans.fit(arr)
 
     # Get cluster labels and centroids
     labels = kmeans.labels_
@@ -47,9 +46,17 @@ def my_k_means(k = 3):
         list_coords = cluster[0]
 
         # Compute Convex Hull
-        hull = ConvexHull(list_coords)
+        cluster[1] = np.asarray(calculate_convex_hull(list_coords), dtype=float)
 
-        cluster[1] = hull.points
+
+    for cluster in list_clusters:
+        points = cluster[1]
+        # Plot polygon
+        plt.plot(points[:, 0], points[:, 1], 'b-', linewidth=2)#, label='Polygon')
+        plt.fill(points[:, 0], points[:, 1], color='skyblue', alpha=0.4)  # Optional fill
+
+        # Plot points
+        #plt.scatter(points[:, 0], points[:, 1], color='darkgreen', zorder=3)
 
     # Plot results
     plt.scatter(X[:, 0], X[:, 1], c=labels, cmap='viridis', alpha=0.6)
@@ -83,4 +90,4 @@ def replace_extension(file_path: str, new_extension: str) -> str:
     new_extension = new_extension if new_extension.startswith(".") else f".{new_extension}"
     return f"{base}{new_extension}"
 
-my_k_means(10)
+#my_k_means(10)
