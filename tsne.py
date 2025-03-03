@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import umap
+from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 
@@ -42,11 +43,15 @@ def plot_tsne(csv_file, target_column=None):
     scaler = StandardScaler()
     df_scaled = scaler.fit_transform(df.select_dtypes(include=[np.number]))
 
+    num_comps = 3
+
     # Run dimension reduce
-    if True:
-        reducer = TSNE(n_components=2, random_state=42)
+    if False:
+        reducer = PCA(n_components=num_comps, random_state=42)
+    elif True:
+        reducer = TSNE(n_components=num_comps, random_state=42)
     else:
-        reducer = umap.UMAP(n_neighbors=15, min_dist=0.1, n_components=2, random_state=42)
+        reducer = umap.UMAP(n_neighbors=15, min_dist=0.1, n_components=num_comps, random_state=42)
 
     results = reducer.fit_transform(df_scaled)
 
@@ -54,8 +59,19 @@ def plot_tsne(csv_file, target_column=None):
 
     clusters = my_k_means(arr, k = 12)
 
-    # Plot results
-    plt.figure(figsize=(8, 6))
+    # Creating figure
+    fig = plt.figure(figsize=(10, 7))
+    ax = plt.axes(projection="3d")
+
+    # Creating plot
+    label_encoder = LabelEncoder()
+    labels_encoded = label_encoder.fit_transform(labels)
+    ax.scatter3D(results[:, 0], results[:, 1], results[:, 2], c=labels_encoded, cmap='viridis', alpha=0.7)
+    plt.title("simple 3D scatter plot")
+
+    # show plot
+    plt.show()
+    exit(0)
     if labels is not None:
         label_encoder = LabelEncoder()
         labels_encoded = label_encoder.fit_transform(labels)
@@ -63,14 +79,6 @@ def plot_tsne(csv_file, target_column=None):
         plt.colorbar(scatter, label='Categories')
     else:
         plt.scatter(results[:, 0], results[:, 1], alpha=0.7)
-
-    length = len(results)
-
-    for index in range(length):
-        axis1 = results[index, 0]
-        axis2 = results[index, 1]
-
-        ##plt.text(tsne1, tsne2, str(index), fontsize=8, ha='right', va='bottom', color='red')
 
     for cluster in clusters:
         hull_points = cluster[1]
@@ -81,6 +89,7 @@ def plot_tsne(csv_file, target_column=None):
     plt.title('t-SNE Visualization')
     plt.xlabel('t-SNE Component 1')
     plt.ylabel('t-SNE Component 2')
+    plt.ylabel('t-SNE Component 3')
     plt.show()
 
 # Example usage:
