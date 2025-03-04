@@ -10,8 +10,18 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder
 
 from utils import replace_extension, csv_to_dict, k_means, my_k_means
 
+str_reducer: str = 'reducer'
+str_params: str = 'params'
+str_n_components = 'n_components'
+str_random_state = 'random_state'
 
-def plot_tsne(csv_file, target_column=None):
+dimension_reduction_methods = [
+    { str_reducer:  PCA, str_params: {str_n_components: 0, str_random_state: 42 }},
+    { str_reducer:  TSNE, str_params: {str_n_components: 0, str_random_state: 42 }},
+    { str_reducer:  umap.UMAP, str_params: {'n_neighbors': 15, 'min_dist': 0.1, str_n_components: 0, str_random_state: 42}}
+]
+
+def calculate_dimension_reduction(csv_file, target_column=None):
     # Load data
     df = pd.read_csv(csv_file)
 
@@ -46,12 +56,17 @@ def plot_tsne(csv_file, target_column=None):
     num_comps = 3
 
     # Run dimension reduce
-    if False:
-        reducer = PCA(n_components=num_comps, random_state=42)
-    elif True:
-        reducer = TSNE(n_components=num_comps, random_state=42)
-    else:
-        reducer = umap.UMAP(n_neighbors=15, min_dist=0.1, n_components=num_comps, random_state=42)
+    reducer_index = 2
+
+    reducer = dimension_reduction_methods[reducer_index]
+
+    reducer_method = reducer[str_reducer]
+    reducer_params = reducer[str_params]
+
+    if str_n_components in reducer_params:
+        reducer_params[str_n_components] = num_comps
+
+    reducer = reducer_method(**reducer_params)
 
     results = reducer.fit_transform(df_scaled)
 
@@ -104,4 +119,4 @@ arr_files: list = [
 
 file_path: str = arr_files[-1]
 
-plot_tsne(file_path, target_column="category")
+calculate_dimension_reduction(file_path, target_column="category")
