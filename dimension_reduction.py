@@ -14,11 +14,15 @@ str_reducer: str = 'reducer'
 str_params: str = 'params'
 str_n_components = 'n_components'
 str_random_state = 'random_state'
+str_display_name = 'display_name'
 
 dimension_reduction_methods = [
-    { str_reducer:  PCA, str_params: {str_n_components: 0, str_random_state: 42 }},
-    { str_reducer:  TSNE, str_params: {str_n_components: 0, str_random_state: 42 }},
-    { str_reducer:  umap.UMAP, str_params: {'n_neighbors': 15, 'min_dist': 0.1, str_n_components: 0, str_random_state: 42}}
+    { str_reducer:  PCA, str_display_name: 'PCA',
+      str_params: {str_n_components: 0, str_random_state: 42 }},
+    { str_reducer:  TSNE, str_display_name: 't-SNE',
+      str_params: {str_n_components: 0, str_random_state: 42 }},
+    { str_reducer:  umap.UMAP, str_display_name: 'UMAP',
+      str_params: {'n_neighbors': 15, 'min_dist': 0.1, str_n_components: 0, str_random_state: 42}}
 ]
 
 def calculate_dimension_reduction(csv_file, target_column=None):
@@ -62,6 +66,7 @@ def calculate_dimension_reduction(csv_file, target_column=None):
 
     reducer_method = reducer[str_reducer]
     reducer_params = reducer[str_params]
+    reducer_display_name = reducer[str_display_name]
 
     if str_n_components in reducer_params:
         reducer_params[str_n_components] = num_comps
@@ -102,9 +107,9 @@ def calculate_dimension_reduction(csv_file, target_column=None):
         ##plt.fill(hull_points[:, 0], hull_points[:, 1], color='skyblue', alpha=0.4)  # Optional fill
 
     plt.title('t-SNE Visualization')
-    plt.xlabel('t-SNE Component 1')
-    plt.ylabel('t-SNE Component 2')
-    plt.ylabel('t-SNE Component 3')
+    plt.xlabel(f'{reducer_display_name} Component 1')
+    plt.ylabel(f'{reducer_display_name} Component 2')
+    plt.ylabel(f'{reducer_display_name} Component 3')
     plt.show()
 
 # Example usage:
