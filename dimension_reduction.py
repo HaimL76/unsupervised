@@ -60,7 +60,7 @@ def calculate_dimension_reduction(csv_file, target_column=None):
     num_comps = 3
 
     # Run dimension reduce
-    reducer_index = 2
+    reducer_index = 0
 
     reducer = dimension_reduction_methods[reducer_index]
 
@@ -81,15 +81,28 @@ def calculate_dimension_reduction(csv_file, target_column=None):
 
     # Creating figure
     fig = plt.figure(figsize=(10, 7))
-    ax = plt.axes(projection="3d")
 
-    # Creating plot
+    plt.title(f'{reducer_display_name} simple {num_comps}D scatter plot')
+
     label_encoder = LabelEncoder()
     labels_encoded = label_encoder.fit_transform(labels)
-    ax.scatter3D(results[:, 0], results[:, 1], results[:, 2], c=labels_encoded, cmap='viridis', alpha=0.7)
-    plt.title("simple 3D scatter plot")
+
+    # Creating plot
+    if num_comps == 2:
+        plt.scatter(results[:, 0], results[:, 1], c=labels_encoded, alpha=0.7)
+    else:
+        ax = plt.axes(projection="3d")
+        ax.scatter3D(results[:, 0], results[:, 1], results[:, 2], c=labels_encoded, cmap='viridis', alpha=0.7)
 
     # show plot
+    if num_comps == 2:
+        plt.xlabel(f'{reducer_display_name} Component 1')
+        plt.ylabel(f'{reducer_display_name} Component 2')
+    else:
+        ax.set_xlabel(f'{reducer_display_name} Component 1')
+        ax.set_xlabel(f'{reducer_display_name} Component 2')
+        ax.set_xlabel(f'{reducer_display_name} Component 3')
+
     plt.show()
     exit(0)
     if labels is not None:
@@ -105,12 +118,6 @@ def calculate_dimension_reduction(csv_file, target_column=None):
         # Plot polygon
         plt.plot(hull_points[:, 0], hull_points[:, 1], 'b-', linewidth=2)  # , label='Polygon')
         ##plt.fill(hull_points[:, 0], hull_points[:, 1], color='skyblue', alpha=0.4)  # Optional fill
-
-    plt.title('t-SNE Visualization')
-    plt.xlabel(f'{reducer_display_name} Component 1')
-    plt.ylabel(f'{reducer_display_name} Component 2')
-    plt.ylabel(f'{reducer_display_name} Component 3')
-    plt.show()
 
 # Example usage:
 arr_files: list = [
