@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import umap
+from numpy.core.records import ndarray
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler, LabelEncoder
@@ -57,10 +58,10 @@ def calculate_dimension_reduction(csv_file, target_column=None):
     scaler = StandardScaler()
     df_scaled = scaler.fit_transform(df.select_dtypes(include=[np.number]))
 
-    num_comps = 3
+    num_comps = 2
 
     # Run dimension reduce
-    reducer_index = 0
+    reducer_index = 1
 
     reducer = dimension_reduction_methods[reducer_index]
 
@@ -103,21 +104,26 @@ def calculate_dimension_reduction(csv_file, target_column=None):
         ax.set_xlabel(f'{reducer_display_name} Component 2')
         ax.set_xlabel(f'{reducer_display_name} Component 3')
 
-    plt.show()
-    exit(0)
-    if labels is not None:
-        label_encoder = LabelEncoder()
-        labels_encoded = label_encoder.fit_transform(labels)
-        scatter = plt.scatter(results[:, 0], results[:, 1], c=labels_encoded, cmap='viridis', alpha=0.7)
-        plt.colorbar(scatter, label='Categories')
-    else:
-        plt.scatter(results[:, 0], results[:, 1], alpha=0.7)
+    #if labels is not None:
+     #   label_encoder = LabelEncoder()
+      #  labels_encoded = label_encoder.fit_transform(labels)
+       # scatter = plt.scatter(results[:, 0], results[:, 1], c=labels_encoded, cmap='viridis', alpha=0.7)
+        #plt.colorbar(scatter, label='Categories')
+    #else:
+     #   plt.scatter(results[:, 0], results[:, 1], alpha=0.7)
 
     for cluster in clusters:
         hull_points = cluster[1]
-        # Plot polygon
-        plt.plot(hull_points[:, 0], hull_points[:, 1], 'b-', linewidth=2)  # , label='Polygon')
-        ##plt.fill(hull_points[:, 0], hull_points[:, 1], color='skyblue', alpha=0.4)  # Optional fill
+
+        if isinstance(hull_points, ndarray):
+            shape = hull_points.shape
+
+            if isinstance(shape, tuple) and len(shape) == 2:#3?
+                # Plot polygon
+                plt.plot(hull_points[:, 0], hull_points[:, 1], 'b-', linewidth=2)  # , label='Polygon')
+                ##plt.fill(hull_points[:, 0], hull_points[:, 1], color='skyblue', alpha=0.4)  # Optional fill
+
+    plt.show()
 
 # Example usage:
 arr_files: list = [

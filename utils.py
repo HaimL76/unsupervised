@@ -1,69 +1,14 @@
 import csv
 import os
+
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans, DBSCAN
 
 from scipy.spatial import ConvexHull
 from sklearn.cluster import k_means
 
 from convex_hull import calculate_convex_hull
-
-
-def my_k_means(points: np.ndarray, k = 3):
-    # Apply K-Means
-      # Number of clusters
-    kmeans = KMeans(n_clusters=k, random_state=0, n_init=10)
-    kmeans.fit(points)
-
-    # Get cluster labels and centroids
-    labels = kmeans.labels_
-    centroids = kmeans.cluster_centers_
-
-    list_clusters = [None] * len(centroids)
-
-    for index in range(len(points)):
-        coords = points[index]
-        label = labels[index]
-
-        tup = list_clusters[label]
-
-        if not tup:
-            list_clusters[label] = [None,None]
-
-        tup = list_clusters[label]
-
-        list_coords = tup[0]
-
-        if not list_coords:
-            tup[0] = []
-
-        list_coords = tup[0]
-
-        list_coords.append(coords)
-
-    for cluster in list_clusters:
-        list_coords = cluster[0]
-
-        # Compute Convex Hull
-        cluster[1] = np.asarray(calculate_convex_hull(list_coords), dtype=float)
-
-    return list_clusters
-
-    for cluster in list_clusters:
-        hull_points = cluster[1]
-        # Plot polygon
-        plt.plot(hull_points[:, 0], hull_points[:, 1], 'b-', linewidth=2)#, label='Polygon')
-        plt.fill(hull_points[:, 0], hull_points[:, 1], color='skyblue', alpha=0.4)  # Optional fill
-
-        # Plot points
-        #plt.scatter(points[:, 0], points[:, 1], color='darkgreen', zorder=3)
-
-    # Plot results
-    plt.scatter(points[:, 0], points[:, 1], c=labels, cmap='viridis', alpha=0.6)
-    plt.scatter(centroids[:, 0], centroids[:, 1], c='red', marker='X', s=200, label="Centroids")
-    plt.legend()
-    plt.show()
 
 def csv_to_dict(filename):
     d = dict()
