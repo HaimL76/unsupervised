@@ -1,7 +1,9 @@
 import numpy as np
 from sklearn.cluster import KMeans, DBSCAN
 
-str_clustering: str = 'clutering'
+from convex_hull import calculate_convex_hull
+
+str_method: str = 'method'
 str_params: str = 'params'
 str_display_name: str = 'display_name'
 str_n_clusters: str = 'n_clusters'
@@ -9,31 +11,37 @@ str_random_state: str = 'random_state'
 str_n_init: str = 'n_init'
 
 def calculate_clusters(points: np.ndarray, k = 3):
-    clustering_methods = [
-        {str_clustering: KMeans, str_display_name: 'KMeans',
+    clustering_options = [
+        {str_method: KMeans, str_display_name: 'KMeans',
          str_params: {str_n_clusters: k, str_random_state: 0, str_n_init: 10}},
-        {str_clustering: DBSCAN, str_display_name: 'DBSCAN',
+        {str_method: DBSCAN, str_display_name: 'DBSCAN',
          str_params: {'eps': 0.3, 'min_samples': 10}}
     ]
 
-    clustering_method = clustering_methods[1]
+    clustering = clustering_options[0]
+
+    clustering_method = clustering[str_method]
+    clustering_params = clustering[str_params]
+    clustering_display_name = clustering[str_display_name]
+
+    clustering_object = clustering_method(**clustering_params)
+
+    clustering_object.fit(points)
 
     # Get cluster labels and centroids
-    labels = kmeans.labels_
-    centroids = kmeans.cluster_centers_
+    labels = clustering_object.labels_
 
-    # Get cluster labels and centroids
-    labels = dbscan.labels_
+    list_clusters = []
 
     if len(labels) > 0:
-        centroids = set(labels)
+        clusters = set(labels)
 
-        if -1 in centroids:
-            centroids.remove(-1)
+        if -1 in clusters:
+            clusters.remove(-1)
             #centroids = dbscan.cluster_centers_
 
-        if len(centroids) > 0:
-            list_clusters = [None] * len(centroids)
+        if len(clusters) > 0:
+            list_clusters = [None] * len(clusters)
 
             for index in range(len(points)):
                 coords = points[index]

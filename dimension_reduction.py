@@ -9,7 +9,8 @@ from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 
-from utils import replace_extension, csv_to_dict, k_means, my_k_means
+from clustering import calculate_clusters
+from utils import replace_extension, csv_to_dict, k_means
 
 str_reducer: str = 'reducer'
 str_params: str = 'params'
@@ -61,7 +62,7 @@ def calculate_dimension_reduction(csv_file, target_column=None):
     num_comps = 2
 
     # Run dimension reduce
-    reducer_index = 1
+    reducer_index = 2
 
     reducer = dimension_reduction_methods[reducer_index]
 
@@ -78,7 +79,7 @@ def calculate_dimension_reduction(csv_file, target_column=None):
 
     arr = np.asarray(results, dtype=float)
 
-    clusters = my_k_means(arr, k = 12)
+    clusters = calculate_clusters(arr, k = 12)
 
     # Creating figure
     fig = plt.figure(figsize=(10, 7))
