@@ -16,7 +16,9 @@ def calculate_epsilon(points: np.ndarray):
     array_length: int = points.shape[0]
     array_width: int = points.shape[1]
 
-    square_of_radius: float = 0
+    min_coords = [math.nan] * array_width
+    max_coords = [math.nan] * array_width
+    len_coords = [math.nan] * array_width
 
     for point in points:
         r = 0
@@ -24,22 +26,20 @@ def calculate_epsilon(points: np.ndarray):
         for i in range(array_width):
             c = point[i]
 
-            r += c*c
+            min_coord: float = min_coords[i]
 
-        if r > square_of_radius:
-            square_of_radius = r
+            if min_coord is math.nan or c < min_coord:
+                min_coords[i] = c
 
-    radius: float = math.sqrt(square_of_radius)
+            max_coord: float = max_coords[i]
 
-    diameter: float = radius * 2
+            if max_coord is math.nan or c > max_coord:
+                max_coords[i] = c
 
-    area: float = radius * radius
+    for i in range(array_width):
+        len_coords[i] = math.fabs(max_coords[i] - min_coords[i])
 
-    area_unit: float = area / array_length
-
-    epsilon: float = math.sqrt(area_unit)
-
-    return epsilon
+    return 0.3
 
 def calculate_clusters(points: np.ndarray, k = 3):
     clustering_options = [
