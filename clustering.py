@@ -29,9 +29,15 @@ def calculate_epsilon(points: np.ndarray):
         if r > square_of_radius:
             square_of_radius = r
 
-    diameter: float = math.sqrt(square_of_radius) * 2
+    radius: float = math.sqrt(square_of_radius)
 
-    epsilon = diameter / 50# array_length
+    diameter: float = radius * 2
+
+    area: float = radius * radius
+
+    area_unit: float = area / array_length
+
+    epsilon: float = math.sqrt(area_unit)
 
     return epsilon
 
