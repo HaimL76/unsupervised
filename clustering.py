@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 from sklearn.cluster import KMeans, DBSCAN
 
@@ -10,6 +12,29 @@ str_n_clusters: str = 'n_clusters'
 str_random_state: str = 'random_state'
 str_n_init: str = 'n_init'
 
+def calculate_epsilon(points: np.ndarray):
+    array_length: int = points.shape[0]
+    array_width: int = points.shape[1]
+
+    square_of_radius: float = 0
+
+    for point in points:
+        r = 0
+
+        for i in range(array_width):
+            c = point[i]
+
+            r += c*c
+
+        if r > square_of_radius:
+            square_of_radius = r
+
+    diameter: float = math.sqrt(square_of_radius) * 2
+
+    epsilon = diameter / array_length
+
+    return epsilon
+
 def calculate_clusters(points: np.ndarray, k = 3):
     clustering_options = [
         {str_method: KMeans, str_display_name: 'KMeans',
@@ -17,6 +42,8 @@ def calculate_clusters(points: np.ndarray, k = 3):
         {str_method: DBSCAN, str_display_name: 'DBSCAN',
          str_params: {'eps': 0.3, 'min_samples': 10}}
     ]
+
+    calculate_epsilon(points)
 
     clustering = clustering_options[0]
 
