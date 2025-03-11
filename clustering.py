@@ -31,7 +31,7 @@ def calculate_epsilon(points: np.ndarray):
 
     diameter: float = math.sqrt(square_of_radius) * 2
 
-    epsilon = diameter / array_length
+    epsilon = diameter / 50# array_length
 
     return epsilon
 
@@ -43,13 +43,16 @@ def calculate_clusters(points: np.ndarray, k = 3):
          str_params: {'eps': 0.3, 'min_samples': 10}}
     ]
 
-    calculate_epsilon(points)
-
-    clustering = clustering_options[0]
+    clustering = clustering_options[1]
 
     clustering_method = clustering[str_method]
     clustering_params = clustering[str_params]
     clustering_display_name = clustering[str_display_name]
+
+    if clustering_method == DBSCAN and 'eps' in clustering_params:
+        epsilon = calculate_epsilon(points)
+
+        clustering_params['eps'] = epsilon
 
     clustering_object = clustering_method(**clustering_params)
 

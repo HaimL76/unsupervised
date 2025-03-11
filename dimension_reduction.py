@@ -62,7 +62,7 @@ def calculate_dimension_reduction(csv_file, target_column=None):
     num_comps = 2
 
     # Run dimension reduce
-    reducer_index = 0
+    reducer_index = 2
 
     reducer = dimension_reduction_methods[reducer_index]
 
