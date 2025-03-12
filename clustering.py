@@ -2,6 +2,7 @@ import math
 
 import numpy as np
 from sklearn.cluster import KMeans, DBSCAN
+from sklearn.mixture import GaussianMixture
 
 from convex_hull import calculate_convex_hull
 
@@ -9,8 +10,10 @@ str_method: str = 'method'
 str_params: str = 'params'
 str_display_name: str = 'display_name'
 str_n_clusters: str = 'n_clusters'
+str_n_components: str = 'n_components'
 str_random_state: str = 'random_state'
 str_n_init: str = 'n_init'
+str_labels: str = 'labels_'
 
 def calculate_epsilon(points: np.ndarray):
     array_length: int = points.shape[0]
@@ -53,10 +56,12 @@ def calculate_clusters(points: np.ndarray, k = 3):
         {str_method: KMeans, str_display_name: 'KMeans',
          str_params: {str_n_clusters: k, str_random_state: 0, str_n_init: 10}},
         {str_method: DBSCAN, str_display_name: 'DBSCAN',
-         str_params: {'eps': 0.3, 'min_samples': 10}}
+         str_params: {'eps': 0.3, 'min_samples': 10}},
+        {str_method: GaussianMixture, str_display_name: 'GaussianMixture',
+         str_params: {str_n_components: k}}
     ]
 
-    clustering = clustering_options[1]
+    clustering = clustering_options[2]
 
     clustering_method = clustering[str_method]
     clustering_params = clustering[str_params]
@@ -71,8 +76,12 @@ def calculate_clusters(points: np.ndarray, k = 3):
 
     clustering_object.fit(points)
 
-    # Get cluster labels and centroids
-    labels = clustering_object.labels_
+    labels = None
+
+    if hasattr(clustering_object, str_labels):
+        labels = clustering_object.labels_
+    else:
+        labels = clustering_object.predict(points)
 
     list_clusters = []
 
