@@ -39,7 +39,14 @@ def calculate_epsilon(points: np.ndarray):
     for i in range(array_width):
         len_coords[i] = math.fabs(max_coords[i] - min_coords[i])
 
-    return 0.3
+    area: float = 1
+
+    for i in range(array_width):
+        area *= len_coords[i]
+
+    point_area: float = area / array_length
+
+    return math.pow(point_area, 1/array_width)
 
 def calculate_clusters(points: np.ndarray, k = 3):
     clustering_options = [
