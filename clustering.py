@@ -51,14 +51,14 @@ def calculate_epsilon(points: np.ndarray):
 
     return math.pow(point_area, 1/array_width)
 
-def calculate_clusters(points: np.ndarray, k = 3):
+def calculate_clusters(points: np.ndarray, k_min: int = 3, k_max: int = 3):
     clustering_options = [
         {str_method: KMeans, str_display_name: 'KMeans',
-         str_params: {str_n_clusters: k, str_random_state: 0, str_n_init: 10}},
+         str_params: {str_n_clusters: k_min, str_random_state: 0, str_n_init: 10}},
         {str_method: DBSCAN, str_display_name: 'DBSCAN',
          str_params: {'eps': 0.3, 'min_samples': 10}},
         {str_method: GaussianMixture, str_display_name: 'GaussianMixture',
-         str_params: {str_n_components: k}}
+         str_params: {str_n_components: k_min}}
     ]
 
     clustering = clustering_options[2]
@@ -72,16 +72,20 @@ def calculate_clusters(points: np.ndarray, k = 3):
 
         clustering_params['eps'] = epsilon
 
-    clustering_object = clustering_method(**clustering_params)
-
-    clustering_object.fit(points)
-
     labels = None
 
-    if hasattr(clustering_object, str_labels):
-        labels = clustering_object.labels_
-    else:
-        labels = clustering_object.predict(points)
+    for index in range(k_min, k_max):
+        if str_n_clusters in clustering_params:
+            clustering_params[str_n_clusters] = index
+
+        clustering_object = clustering_method(**clustering_params)
+
+        clustering_object.fit(points)
+
+        if hasattr(clustering_object, str_labels):
+            labels = clustering_object.labels_
+        else:
+            labels = clustering_object.predict(points)
 
     list_clusters = []
 
