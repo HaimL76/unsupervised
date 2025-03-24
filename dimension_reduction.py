@@ -79,7 +79,7 @@ def calculate_dimension_reduction(csv_file, target_column=None):
 
     arr = np.asarray(results, dtype=float)
 
-    clusters = calculate_clusters(arr, k = 12)
+    clusters = calculate_clusters(arr, k_min = 3, k_max=31)
 
     # Creating figure
     fig = plt.figure(figsize=(10, 7))

@@ -14,6 +14,7 @@ str_n_components: str = 'n_components'
 str_random_state: str = 'random_state'
 str_n_init: str = 'n_init'
 str_labels: str = 'labels_'
+str_inertia: str = 'inertia_'
 
 def calculate_epsilon(points: np.ndarray):
     array_length: int = points.shape[0]
@@ -61,7 +62,7 @@ def calculate_clusters(points: np.ndarray, k_min: int = 3, k_max: int = 3):
          str_params: {str_n_components: k_min}}
     ]
 
-    clustering = clustering_options[2]
+    clustering = clustering_options[0]
 
     clustering_method = clustering[str_method]
     clustering_params = clustering[str_params]
@@ -74,6 +75,12 @@ def calculate_clusters(points: np.ndarray, k_min: int = 3, k_max: int = 3):
 
     labels = None
 
+    k_max = k_max + 1
+
+    k_num: int = k_max - k_min
+
+    distortions = [0] * k_num
+
     for index in range(k_min, k_max):
         if str_n_clusters in clustering_params:
             clustering_params[str_n_clusters] = index
@@ -81,6 +88,11 @@ def calculate_clusters(points: np.ndarray, k_min: int = 3, k_max: int = 3):
         clustering_object = clustering_method(**clustering_params)
 
         clustering_object.fit(points)
+
+        if hasattr(clustering_object, str_inertia):
+            index -= k_min
+
+            distortions[index] = clustering_object.inertia_
 
         if hasattr(clustering_object, str_labels):
             labels = clustering_object.labels_
