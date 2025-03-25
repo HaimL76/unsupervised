@@ -118,7 +118,7 @@ def calculate_clusters(points: np.ndarray, k_min: int = 3, k_max: int = 3):
         for index in range(length_results):
             k: int = index + k_min
 
-            if 0 < index < len(results) - 1:
+            if 0 < index < length_results - 1:
                 labels = results[index][0]
 
                 y_0 = results[index - 1][1]
@@ -151,7 +151,7 @@ def calculate_clusters(points: np.ndarray, k_min: int = 3, k_max: int = 3):
 
     list_clusters = []
 
-    if opt_labels and len(opt_labels) > 0:
+    if opt_labels is not None and len(opt_labels) > 0:
         clusters = set(labels)
 
         if -1 in clusters:
