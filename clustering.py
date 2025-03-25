@@ -111,6 +111,9 @@ def calculate_clusters(points: np.ndarray, k_min: int = 3, k_max: int = 3):
 
     length_results: int = 1
 
+    if results:
+        length_results = len(results)
+
     if len(results) > 3:
         for index in range(length_results):
             k: int = index + k_min
