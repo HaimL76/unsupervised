@@ -27,7 +27,7 @@ dimension_reduction_methods = [
       str_params: {'n_neighbors': 15, 'min_dist': 0.1, str_n_components: 0, str_random_state: 42}}
 ]
 
-def calculate_dimension_reduction(csv_file, target_column=None):
+def calculate(csv_file, target_column=None):
     # Load data
     df = pd.read_csv(csv_file)
 
@@ -59,11 +59,13 @@ def calculate_dimension_reduction(csv_file, target_column=None):
     scaler = StandardScaler()
     df_scaled = scaler.fit_transform(df.select_dtypes(include=[np.number]))
 
+    for reducer_index in range(len(dimension_reduction_methods)):
+        calculate_dimension_reduction(df_scaled, reducer_index, labels, target_column)
+
+def calculate_dimension_reduction(df_scaled, reducer_index, labels, target_column=None):
     num_comps = 2
 
     # Run dimension reduce
-    reducer_index = 0
-
     reducer = dimension_reduction_methods[reducer_index]
 
     reducer_method = reducer[str_reducer]
@@ -81,6 +83,9 @@ def calculate_dimension_reduction(csv_file, target_column=None):
 
     clusters = calculate_clusters(arr, k_min = 3, k_max=31)
 
+    save_results_to_image(reducer_display_name, num_comps, labels, results, clusters)
+
+def save_results_to_image(reducer_display_name, num_comps, labels, results, clusters):
     # Creating figure
     fig = plt.figure(figsize=(10, 7))
 
@@ -124,7 +129,14 @@ def calculate_dimension_reduction(csv_file, target_column=None):
                 plt.plot(hull_points[:, 0], hull_points[:, 1], 'b-', linewidth=2)  # , label='Polygon')
                 ##plt.fill(hull_points[:, 0], hull_points[:, 1], color='skyblue', alpha=0.4)  # Optional fill
 
-    plt.show()
+    ##dir_path = os.path.join('ds', 'output')
+    ##plt.show()
+    if not os.path.exists('output'):
+        os.makedirs('output')
+
+    out_file_path = os.path.join('output', f'{reducer_display_name}.png')
+
+    plt.savefig(out_file_path)
 
 # Example usage:
 arr_files: list = [
@@ -138,4 +150,4 @@ arr_files: list = [
 
 file_path: str = arr_files[-1]
 
-calculate_dimension_reduction(file_path, target_column="category")
+calculate(file_path, target_column="category")
