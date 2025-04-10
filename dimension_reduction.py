@@ -4,7 +4,6 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import umap
-from numpy.core.records import ndarray
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler, LabelEncoder
@@ -126,7 +125,7 @@ def save_results_to_image(reducer_display_name, cluster_display_name, num_comps,
     for cluster in clusters:
         hull_points = cluster[1]
 
-        if isinstance(hull_points, ndarray):
+        if isinstance(hull_points, np.ndarray):
             shape = hull_points.shape
 
             if isinstance(shape, tuple) and len(shape) == 2:#3?
