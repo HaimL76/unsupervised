@@ -52,8 +52,9 @@ def calculate_epsilon(points: np.ndarray):
 
     return math.pow(point_area, 1/array_width)
 
-def calculate_clusters(points: np.ndarray, k_min: int = 3, k_max: int = 3):
-    clustering_options = [
+k_min = 3
+
+clustering_options = [
         {str_method: KMeans, str_display_name: 'KMeans',
          str_params: {str_n_clusters: k_min, str_random_state: 0, str_n_init: 10}},
         {str_method: DBSCAN, str_display_name: 'DBSCAN',
@@ -62,8 +63,7 @@ def calculate_clusters(points: np.ndarray, k_min: int = 3, k_max: int = 3):
          str_params: {str_n_components: k_min}}
     ]
 
-    clustering = clustering_options[0]
-
+def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: int = 3):
     clustering_method = clustering[str_method]
     clustering_params = clustering[str_params]
     clustering_display_name = clustering[str_display_name]
@@ -114,7 +114,7 @@ def calculate_clusters(points: np.ndarray, k_min: int = 3, k_max: int = 3):
     if results:
         length_results = len(results)
 
-    if len(results) > 3:
+    if False:# len(results) > 3:
         for index in range(length_results):
             k: int = index + k_min
 

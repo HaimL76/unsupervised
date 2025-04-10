@@ -9,7 +9,7 @@ from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 
-from clustering import calculate_clusters
+from clustering import calculate_clusters, clustering_options
 from utils import replace_extension, csv_to_dict, k_means
 
 str_reducer: str = 'reducer'
@@ -81,11 +81,16 @@ def calculate_dimension_reduction(df_scaled, reducer_index, labels, target_colum
 
     arr = np.asarray(results, dtype=float)
 
-    clusters = calculate_clusters(arr, k_min = 3, k_max=31)
+    for cluster_index in range(len(clustering_options)):
+        clustering = clustering_options[cluster_index]
 
-    save_results_to_image(reducer_display_name, num_comps, labels, results, clusters)
+        clusters = calculate_clusters(arr, clustering, k_min = 3, k_max=30)
 
-def save_results_to_image(reducer_display_name, num_comps, labels, results, clusters):
+        cluster_display_name = clustering[str_display_name]
+
+        save_results_to_image(reducer_display_name, cluster_display_name, num_comps, labels, results, clusters)
+
+def save_results_to_image(reducer_display_name, cluster_display_name, num_comps, labels, results, clusters):
     # Creating figure
     fig = plt.figure(figsize=(10, 7))
 
@@ -134,7 +139,7 @@ def save_results_to_image(reducer_display_name, num_comps, labels, results, clus
     if not os.path.exists('output'):
         os.makedirs('output')
 
-    out_file_path = os.path.join('output', f'{reducer_display_name}.png')
+    out_file_path = os.path.join('output', f'{reducer_display_name}-{cluster_display_name}.png')
 
     plt.savefig(out_file_path)
 
