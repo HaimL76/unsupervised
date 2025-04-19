@@ -59,7 +59,7 @@ def calculate(csv_file, target_column=None):
     df_scaled = scaler.fit_transform(df.select_dtypes(include=[np.number]))
 
     for reducer_index in range(len(dimension_reduction_methods)):
-        print(f'reducer index = {reducer_index}')
+        #print(f'reducer index = {reducer_index}')
 
         calculate_dimension_reduction(df_scaled, reducer_index, labels, target_column)
 
@@ -83,13 +83,13 @@ def calculate_dimension_reduction(df_scaled, reducer_index, labels, target_colum
     arr = np.asarray(results, dtype=float)
 
     for cluster_index in range(len(clustering_options)):
-        print(f'reducer index = {reducer_index}, cluster index = {cluster_index}')
-
         clustering = clustering_options[cluster_index]
 
-        clusters = calculate_clusters(arr, clustering, k_min = 3, k_max=30)
-
         cluster_display_name = clustering[str_display_name]
+
+        print(f'reducer = {reducer_display_name}, cluster = {cluster_display_name}')
+
+        clusters = calculate_clusters(arr, clustering, k_min=3, k_max=30)
 
         save_results_to_image(reducer_display_name, cluster_display_name, num_comps, labels, results, clusters)
 
@@ -118,14 +118,6 @@ def save_results_to_image(reducer_display_name, cluster_display_name, num_comps,
         ax.set_xlabel(f'{reducer_display_name} Component 2')
         ax.set_xlabel(f'{reducer_display_name} Component 3')
 
-    #if labels is not None:
-     #   label_encoder = LabelEncoder()
-      #  labels_encoded = label_encoder.fit_transform(labels)
-       # scatter = plt.scatter(results[:, 0], results[:, 1], c=labels_encoded, cmap='viridis', alpha=0.7)
-        #plt.colorbar(scatter, label='Categories')
-    #else:
-     #   plt.scatter(results[:, 0], results[:, 1], alpha=0.7)
-
     for cluster in clusters:
         hull_points = cluster[1]
 
@@ -135,10 +127,7 @@ def save_results_to_image(reducer_display_name, cluster_display_name, num_comps,
             if isinstance(shape, tuple) and len(shape) == 2:#3?
                 # Plot polygon
                 plt.plot(hull_points[:, 0], hull_points[:, 1], 'b-', linewidth=2)  # , label='Polygon')
-                ##plt.fill(hull_points[:, 0], hull_points[:, 1], color='skyblue', alpha=0.4)  # Optional fill
 
-    ##dir_path = os.path.join('ds', 'output')
-    ##plt.show()
     if not os.path.exists('output'):
         os.makedirs('output')
 

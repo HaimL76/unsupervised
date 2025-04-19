@@ -3,6 +3,7 @@ import math
 import numpy as np
 from sklearn.cluster import KMeans, DBSCAN
 from sklearn.mixture import GaussianMixture
+from sklearn.metrics import silhouette_score
 
 from convex_hull import calculate_convex_hull
 
@@ -82,6 +83,7 @@ def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: in
     results = [None] * k_num
 
     opt_k: int = 0
+    highest_score: float = None
     opt_labels: None
 
     length_results: int = len(results)
@@ -101,11 +103,19 @@ def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: in
         else:
             labels = clustering_object.predict(points)
 
-        opt_k = k
-        opt_labels = labels
+        sil_score = silhouette_score(points, labels)
+
+        print(f'k = {k}, sil score = {sil_score}')
+
+        if highest_score is None or highest_score < sil_score:
+            highest_score = sil_score
+            opt_k = k
+            opt_labels = labels
 
         if hasattr(clustering_object, str_inertia):
             results[index] = labels, clustering_object.inertia_
+
+    print(f'opt k = {opt_k}, highest score = {highest_score}')
 
     min_angle: float = 0
 
@@ -113,41 +123,6 @@ def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: in
 
     if results:
         length_results = len(results)
-
-    if False:# len(results) > 3:
-        for index in range(length_results):
-            k: int = index + k_min
-
-            if 0 < index < length_results - 1:
-                labels = results[index][0]
-
-                y_0 = results[index - 1][1]
-                y_1 = results[index][1]
-                y_2 = results[index + 1][1]
-
-                leg1 = y_1 - y_0
-                leg2 = y_2 - y_1
-
-                # Dot product of leg1 and leg2
-                dot_product = 1 + leg1 * leg2
-
-                # Magnitudes of BA and BC
-                magnitude1 = math.sqrt(1 + leg1 ** 2)
-                magnitude2 = math.sqrt(1 ** 2 + leg2 ** 2)
-
-                # Cosine of the angle
-                cos_theta = dot_product / (magnitude1 * magnitude2)
-
-                # Angle in radians
-                angle_radians = math.acos(cos_theta)
-
-                if min_angle == 0 or angle_radians < min_angle:
-                    min_angle = angle_radians
-                    opt_k = k
-                    opt_labels = labels
-
-                # Convert to degrees
-                angle_degrees = math.degrees(angle_radians)
 
     list_clusters = []
 
@@ -159,7 +134,6 @@ def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: in
 
         if -1 in clusters:
             clusters.remove(-1)
-            #centroids = dbscan.cluster_centers_
 
         if len(clusters) > 0:
             list_clusters = [None] * len(clusters)
