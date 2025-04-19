@@ -87,9 +87,9 @@ def calculate_dimension_reduction(df_scaled, reducer_index, labels, target_colum
 
         cluster_display_name = clustering[str_display_name]
 
-        print(f'reducer = {reducer_display_name}, cluster = {cluster_display_name}')
+        prefix = f'reducer = {reducer_display_name}, cluster = {cluster_display_name}'
 
-        clusters = calculate_clusters(arr, clustering, k_min=3, k_max=30)
+        clusters = calculate_clusters(arr, clustering, k_min=2, k_max=30, log_prefix=prefix)
 
         save_results_to_image(reducer_display_name, cluster_display_name, num_comps, labels, results, clusters)
 

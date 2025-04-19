@@ -67,7 +67,8 @@ clustering_options = [
 ]
 
 
-def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: int = 3):
+def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: int = 3,
+                       log_prefix: str = ''):
     clustering_method = clustering[str_method]
     clustering_params = clustering[str_params]
     clustering_display_name = clustering[str_display_name]
@@ -91,11 +92,20 @@ def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: in
 
     length_results: int = len(results)
 
+    has_num_clusters = (str_n_clusters in clustering_params
+                        or str_n_components in clustering_params)
+
+    if not has_num_clusters:
+        length_results = 1
+
     for index in range(length_results):
         k: int = index + k_min
 
         if str_n_clusters in clustering_params:
             clustering_params[str_n_clusters] = k
+
+        if str_n_components in clustering_params:
+            clustering_params[str_n_components] = k
 
         clustering_object = clustering_method(**clustering_params)
 
@@ -108,7 +118,7 @@ def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: in
 
         sil_score = silhouette_score(points, labels)
 
-        print(f'k = {k}, sil score = {sil_score}')
+        print(f'{log_prefix}, k = {k}, sil score = {sil_score}')
 
         if highest_score is None or highest_score < sil_score:
             highest_score = sil_score
@@ -118,7 +128,7 @@ def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: in
         if hasattr(clustering_object, str_inertia):
             results[index] = labels, clustering_object.inertia_
 
-    print(f'opt k = {opt_k}, highest score = {highest_score}')
+    print(f'{log_prefix}, opt k = {opt_k}, highest score = {highest_score}')
 
     if results:
         length_results = len(results)
