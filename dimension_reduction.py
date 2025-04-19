@@ -18,13 +18,14 @@ str_random_state = 'random_state'
 str_display_name = 'display_name'
 
 dimension_reduction_methods = [
-    { str_reducer:  PCA, str_display_name: 'PCA',
-      str_params: {str_n_components: 0, str_random_state: 42 }},
-    { str_reducer:  TSNE, str_display_name: 't-SNE',
-      str_params: {str_n_components: 0, str_random_state: 42 }},
-    { str_reducer:  umap.UMAP, str_display_name: 'UMAP',
-      str_params: {'n_neighbors': 15, 'min_dist': 0.1, str_n_components: 0, str_random_state: 42}}
+    {str_reducer: PCA, str_display_name: 'PCA',
+     str_params: {str_n_components: 0, str_random_state: 42}},
+    {str_reducer: TSNE, str_display_name: 't-SNE',
+     str_params: {str_n_components: 0, str_random_state: 42}},
+    {str_reducer: umap.UMAP, str_display_name: 'UMAP',
+     str_params: {'n_neighbors': 15, 'min_dist': 0.1, str_n_components: 0, str_random_state: 42}}
 ]
+
 
 def calculate(csv_file, target_column=None):
     # Load data
@@ -59,9 +60,8 @@ def calculate(csv_file, target_column=None):
     df_scaled = scaler.fit_transform(df.select_dtypes(include=[np.number]))
 
     for reducer_index in range(len(dimension_reduction_methods)):
-        #print(f'reducer index = {reducer_index}')
-
         calculate_dimension_reduction(df_scaled, reducer_index, labels, target_column)
+
 
 def calculate_dimension_reduction(df_scaled, reducer_index, labels, target_column=None):
     num_comps = 2
@@ -92,6 +92,7 @@ def calculate_dimension_reduction(df_scaled, reducer_index, labels, target_colum
         clusters = calculate_clusters(arr, clustering, k_min=3, k_max=30)
 
         save_results_to_image(reducer_display_name, cluster_display_name, num_comps, labels, results, clusters)
+
 
 def save_results_to_image(reducer_display_name, cluster_display_name, num_comps, labels, results, clusters):
     # Creating figure
@@ -124,7 +125,7 @@ def save_results_to_image(reducer_display_name, cluster_display_name, num_comps,
         if isinstance(hull_points, np.ndarray):
             shape = hull_points.shape
 
-            if isinstance(shape, tuple) and len(shape) == 2:#3?
+            if isinstance(shape, tuple) and len(shape) == 2:  # 3?
                 # Plot polygon
                 plt.plot(hull_points[:, 0], hull_points[:, 1], 'b-', linewidth=2)  # , label='Polygon')
 
@@ -134,6 +135,7 @@ def save_results_to_image(reducer_display_name, cluster_display_name, num_comps,
     out_file_path = os.path.join('output', f'{reducer_display_name}-{cluster_display_name}.png')
 
     plt.savefig(out_file_path)
+
 
 # Example usage:
 arr_files: list = [

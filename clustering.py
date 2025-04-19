@@ -17,6 +17,7 @@ str_n_init: str = 'n_init'
 str_labels: str = 'labels_'
 str_inertia: str = 'inertia_'
 
+
 def calculate_epsilon(points: np.ndarray):
     array_length: int = points.shape[0]
     array_width: int = points.shape[1]
@@ -51,18 +52,20 @@ def calculate_epsilon(points: np.ndarray):
 
     point_area: float = area / array_length
 
-    return math.pow(point_area, 1/array_width)
+    return math.pow(point_area, 1 / array_width)
 
-k_min = 3
+
+k_min_default = 3
 
 clustering_options = [
-        {str_method: KMeans, str_display_name: 'KMeans',
-         str_params: {str_n_clusters: k_min, str_random_state: 0, str_n_init: 10}},
-        {str_method: DBSCAN, str_display_name: 'DBSCAN',
-         str_params: {'eps': 0.3, 'min_samples': 10}},
-        {str_method: GaussianMixture, str_display_name: 'GaussianMixture',
-         str_params: {str_n_components: k_min}}
-    ]
+    {str_method: KMeans, str_display_name: 'KMeans',
+     str_params: {str_n_clusters: k_min_default, str_random_state: 0, str_n_init: 10}},
+    {str_method: DBSCAN, str_display_name: 'DBSCAN',
+     str_params: {'eps': 0.3, 'min_samples': 10}},
+    {str_method: GaussianMixture, str_display_name: 'GaussianMixture',
+     str_params: {str_n_components: k_min_default}}
+]
+
 
 def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: int = 3):
     clustering_method = clustering[str_method]
@@ -117,10 +120,6 @@ def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: in
 
     print(f'opt k = {opt_k}, highest score = {highest_score}')
 
-    min_angle: float = 0
-
-    length_results: int = 1
-
     if results:
         length_results = len(results)
 
@@ -147,7 +146,7 @@ def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: in
                     tup = list_clusters[label]
 
                     if not tup:
-                        list_clusters[label] = [None,None]
+                        list_clusters[label] = [None, None]
 
                     tup = list_clusters[label]
 
