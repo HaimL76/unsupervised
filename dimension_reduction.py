@@ -59,6 +59,8 @@ def calculate(csv_file, target_column=None):
     df_scaled = scaler.fit_transform(df.select_dtypes(include=[np.number]))
 
     for reducer_index in range(len(dimension_reduction_methods)):
+        print(f'reducer index = {reducer_index}')
+
         calculate_dimension_reduction(df_scaled, reducer_index, labels, target_column)
 
 def calculate_dimension_reduction(df_scaled, reducer_index, labels, target_column=None):
@@ -81,6 +83,8 @@ def calculate_dimension_reduction(df_scaled, reducer_index, labels, target_colum
     arr = np.asarray(results, dtype=float)
 
     for cluster_index in range(len(clustering_options)):
+        print(f'reducer index = {reducer_index}, cluster index = {cluster_index}')
+
         clustering = clustering_options[cluster_index]
 
         clusters = calculate_clusters(arr, clustering, k_min = 3, k_max=30)
