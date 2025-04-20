@@ -38,8 +38,6 @@ def calculate(csv_file, target_column=None):
 
         df.rename(columns=column_map, inplace=True)
 
-    target_column = 'Diagnosis'
-
     encoder = LabelEncoder()
 
     column_names = df.keys()
@@ -149,4 +147,4 @@ arr_files: list = [
 
 file_path: str = arr_files[-1]
 
-calculate(file_path, target_column="category")
+calculate(file_path, target_column="Diagnosis")
