@@ -27,7 +27,7 @@ dimension_reduction_methods = [
 ]
 
 
-def calculate(csv_file, target_column=None):
+def calculate(csv_file, target_column=None, drop_target_column: bool = True, columns_to_drop: list = None):
     # Load data
     df = pd.read_csv(csv_file)
 
@@ -38,9 +38,12 @@ def calculate(csv_file, target_column=None):
 
         df.rename(columns=column_map, inplace=True)
 
-    encoder = LabelEncoder()
+    if isinstance(columns_to_drop, list) and len(columns_to_drop) > 0:
+        df = df.drop(columns=columns_to_drop)
 
     column_names = df.keys()
+
+    encoder = LabelEncoder()
 
     for col_name in column_names:
         col = df[col_name]
@@ -49,7 +52,9 @@ def calculate(csv_file, target_column=None):
     # If target_column is provided, extract labels
     if target_column and target_column in df.columns:
         labels = df[target_column]
-        df = df.drop(columns=[target_column])
+
+        if drop_target_column:
+            df = df.drop(columns=[target_column])
     else:
         labels = None
 
@@ -147,4 +152,4 @@ arr_files: list = [
 
 file_path: str = arr_files[-1]
 
-calculate(file_path, target_column="Diagnosis")
+calculate(file_path, target_column="Diagnosis", drop_target_column=False, columns_to_drop=['Patient_ID'])
