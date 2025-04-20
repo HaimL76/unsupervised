@@ -58,6 +58,23 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
     else:
         labels = None
 
+    column_names = df.keys()
+
+    if not os.path.exists('output'):
+        os.makedirs('output')
+
+    features_file_path = os.path.join('output', 'features.txt')
+
+    with open(features_file_path, 'w') as fwriter:
+        for col in df.columns:
+            arr0 = df[col]
+            m = arr0.mean()
+            s = arr0.std()
+            mn = arr0.min()
+            mx = arr0.max()
+
+            fwriter.write(f'{col},{m},{s},{mn},{mx}\n')
+
     # Standardize features
     scaler = StandardScaler()
     df_scaled = scaler.fit_transform(df.select_dtypes(include=[np.number]))
