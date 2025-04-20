@@ -39,7 +39,9 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
         df.rename(columns=column_map, inplace=True)
 
     if isinstance(columns_to_drop, list) and len(columns_to_drop) > 0:
-        df = df.drop(columns=columns_to_drop)
+        for col in columns_to_drop:
+            if col in df.columns:
+                df = df.drop(columns=[col])
 
     column_names = df.keys()
 
