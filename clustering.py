@@ -20,42 +20,19 @@ str_labels: str = 'labels_'
 str_inertia: str = 'inertia_'
 
 
-def calculate_epsilon(points: np.ndarray):
-    array_length: int = points.shape[0]
-    array_width: int = points.shape[1]
+def calculate_epsilon(points: np.ndarray, k=2):
+    X = points[:, 0]
+    Y = points[:, 1]
 
-    min_coords = [math.nan] * array_width
-    max_coords = [math.nan] * array_width
-    len_coords = [math.nan] * array_width
+    max_x = X.max()
+    max_y = Y.max()
+    min_x = X.min()
+    min_y = Y.min()
 
-    for point in points:
-        r = 0
+    len_x = abs(max_x - min_x) / k
+    len_y = abs(max_y - min_y) / k
 
-        for i in range(array_width):
-            c = point[i]
-
-            min_coord: float = min_coords[i]
-
-            if min_coord is math.nan or c < min_coord:
-                min_coords[i] = c
-
-            max_coord: float = max_coords[i]
-
-            if max_coord is math.nan or c > max_coord:
-                max_coords[i] = c
-
-    for i in range(array_width):
-        len_coords[i] = math.fabs(max_coords[i] - min_coords[i])
-
-    area: float = 1
-
-    for i in range(array_width):
-        area *= len_coords[i]
-
-    point_area: float = area / array_length
-
-    return math.pow(point_area, 1 / array_width)
-
+    return math.sqrt(len_x * len_x + len_y * len_y)
 
 k_min_default = 3
 
@@ -77,11 +54,6 @@ def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: in
 
     log_prefix = f'reducer = {reducer_display_name}, cluster = {clustering_display_name}'
 
-    if clustering_method == DBSCAN and 'eps' in clustering_params:
-        epsilon = calculate_epsilon(points)
-
-        clustering_params['eps'] = epsilon
-
     cluster_labels = None
 
     k_max = k_max + 1
@@ -96,12 +68,6 @@ def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: in
 
     length_results: int = len(results)
 
-    has_num_clusters = (str_n_clusters in clustering_params
-                        or str_n_components in clustering_params)
-
-    if not has_num_clusters:
-        length_results = 1
-
     for index in range(length_results):
         k: int = index + k_min
 
@@ -110,6 +76,11 @@ def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: in
 
         if str_n_components in clustering_params:
             clustering_params[str_n_components] = k
+
+        if 'eps' in clustering_params:
+            epsilon = calculate_epsilon(points, k)
+
+            clustering_params['eps'] = epsilon
 
         clustering_object = clustering_method(**clustering_params)
 
@@ -120,14 +91,19 @@ def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: in
         else:
             cluster_labels = clustering_object.predict(points)
 
-        sil_score = silhouette_score(points, cluster_labels)
+        distinct_clusters = set(cluster_labels)
 
-        print(f'{log_prefix}, k = {k}, sil score = {sil_score}')
+        len_cluster_labels = len(distinct_clusters)
 
-        if highest_score is None or highest_score < sil_score:
-            highest_score = sil_score
-            opt_k = k
-            opt_labels = cluster_labels
+        if len_cluster_labels > 1:
+            sil_score = silhouette_score(points, cluster_labels)
+
+            print(f'{log_prefix}, num clusters = {len_cluster_labels}, silhouette score = {sil_score}')
+
+            if highest_score is None or highest_score < sil_score:
+                highest_score = sil_score
+                opt_k = len_cluster_labels
+                opt_labels = cluster_labels
 
         if hasattr(clustering_object, str_inertia):
             results[index] = cluster_labels, clustering_object.inertia_
@@ -142,9 +118,6 @@ def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: in
             'highest_score': highest_score,
             'opt_labels': opt_labels
         })
-
-    if results:
-        length_results = len(results)
 
     list_clusters = []
 
