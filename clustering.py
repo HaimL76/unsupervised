@@ -135,7 +135,13 @@ def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: in
     print(f'{log_prefix}, opt k = {opt_k}, highest score = {highest_score}')
 
     if opt_cluster_scores is not None:
-        opt_cluster_scores.append((reducer_display_name, clustering_display_name, opt_k, highest_score))
+        opt_cluster_scores.append({
+            'reducer_display_name': reducer_display_name,
+            'clustering_display_name': clustering_display_name,
+            'opt_k': opt_k,
+            'highest_score': highest_score,
+            'opt_labels': opt_labels
+        })
 
     if results:
         length_results = len(results)

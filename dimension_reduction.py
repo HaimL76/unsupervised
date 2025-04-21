@@ -11,6 +11,8 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder
 from clustering import calculate_clusters, clustering_options
 from utils import replace_extension, csv_to_dict, k_means
 
+from scipy.stats import f_oneway, kruskal
+
 str_reducer: str = 'reducer'
 str_params: str = 'params'
 str_n_components = 'n_components'
@@ -85,9 +87,40 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
 
     opt_cluster_scores: list = []
 
-    for reducer_index in range(len(dimension_reduction_methods)):
+    len_dimension_reduction_methods = len(dimension_reduction_methods)
+
+    for reducer_index in range(len_dimension_reduction_methods):
         opt_cluster_scores = calculate_dimension_reduction(df_scaled, reducer_index, labels, target_column,
-                                      opt_cluster_scores=opt_cluster_scores)
+                                                           opt_cluster_scores=opt_cluster_scores)
+
+    list_stats: list = []
+
+    for entry in opt_cluster_scores:
+        cluster_labels = entry['opt_labels']
+        num_clusters = entry['opt_k']
+        reducer_display_name = entry['reducer_display_name']
+        clustering_display_name = entry['clustering_display_name']
+
+        if num_clusters > 0:
+            for col in df.columns:
+                arr = df.get(col).tolist()
+
+                list_clusters = [[] for i in range(num_clusters)]
+
+                for i in range(len(arr)):
+                    label = cluster_labels[i]
+
+                    if label < len(list_clusters):
+                        cluster = list_clusters[label]
+                        cluster.append(arr[i])
+
+                f_stat, p_anova = f_oneway(*list_clusters)
+
+                list_stats.append((reducer_display_name,clustering_display_name,col,f_stat,p_anova))
+
+                    #h_stat, p_kruskal = kruskal(*list_clusters)
+            ##anova_results.append((col, f_stat, p_anova))
+            ##kruskal_results.append((col, h_stat, p_kruskal))
 
     if not os.path.exists('output'):
         os.makedirs('output')
@@ -97,8 +130,15 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
     with open(clusters_file_path, 'w') as fwriter:
         fwriter.write('reducer_display_name, clustering_display_name, opt_k, highest_score\n')
 
-        for tup in opt_cluster_scores:
-            fwriter.write(f'{tup[0]},{tup[1]},{tup[2]},{tup[3]}\n')
+        for entry in opt_cluster_scores:
+            reducer_display_name = entry['reducer_display_name']
+            clustering_display_name = entry['clustering_display_name']
+            opt_k = entry['opt_k']
+            highest_score = entry['highest_score']
+
+            str = f'{reducer_display_name},{clustering_display_name},{opt_k},{highest_score}\n'
+
+            fwriter.write(str)
 
 
 def calculate_dimension_reduction(df_scaled, reducer_index, labels, target_column=None,
@@ -121,12 +161,14 @@ def calculate_dimension_reduction(df_scaled, reducer_index, labels, target_colum
 
     arr = np.asarray(results, dtype=float)
 
-    for cluster_index in range(len(clustering_options)):
+    len_clustering_options = len(clustering_options)
+
+    for cluster_index in range(len_clustering_options):
         clustering = clustering_options[cluster_index]
 
         cluster_display_name = clustering[str_display_name]
 
-        clusters, opt_cluster_scores = calculate_clusters(arr, clustering, k_min=2, k_max=30,
+        clusters, opt_cluster_scores = calculate_clusters(arr, clustering, k_min=2, k_max=22,
                                                           reducer_display_name=reducer_display_name,
                                                           opt_cluster_scores=opt_cluster_scores)
 
