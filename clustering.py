@@ -78,7 +78,7 @@ def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: in
 
         clustering_params['eps'] = epsilon
 
-    labels = None
+    cluster_labels = None
 
     k_max = k_max + 1
 
@@ -112,21 +112,21 @@ def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: in
         clustering_object.fit(points)
 
         if hasattr(clustering_object, str_labels):
-            labels = clustering_object.labels_
+            cluster_labels = clustering_object.labels_
         else:
-            labels = clustering_object.predict(points)
+            cluster_labels = clustering_object.predict(points)
 
-        sil_score = silhouette_score(points, labels)
+        sil_score = silhouette_score(points, cluster_labels)
 
         print(f'{log_prefix}, k = {k}, sil score = {sil_score}')
 
         if highest_score is None or highest_score < sil_score:
             highest_score = sil_score
             opt_k = k
-            opt_labels = labels
+            opt_labels = cluster_labels
 
         if hasattr(clustering_object, str_inertia):
-            results[index] = labels, clustering_object.inertia_
+            results[index] = cluster_labels, clustering_object.inertia_
 
     print(f'{log_prefix}, opt k = {opt_k}, highest score = {highest_score}')
 
@@ -136,10 +136,10 @@ def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: in
     list_clusters = []
 
     if opt_labels is not None and len(opt_labels) > 0:
-        labels = opt_labels
+        cluster_labels = opt_labels
 
-    if labels is not None and len(labels) > 0:
-        clusters = set(labels)
+    if cluster_labels is not None and len(cluster_labels) > 0:
+        clusters = set(cluster_labels)
 
         if -1 in clusters:
             clusters.remove(-1)
@@ -150,8 +150,8 @@ def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: in
             for index in range(len(points)):
                 coords = points[index]
 
-                if index < len(labels):
-                    label = labels[index]
+                if index < len(cluster_labels):
+                    label = cluster_labels[index]
 
                     tup = list_clusters[label]
 

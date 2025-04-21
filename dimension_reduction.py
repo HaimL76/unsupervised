@@ -68,6 +68,8 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
     features_file_path = os.path.join('output', 'features.txt')
 
     with open(features_file_path, 'w') as fwriter:
+        fwriter.write('feature,mean,std,min,max\n')
+
         for col in df.columns:
             arr0 = df[col]
             m = arr0.mean()
