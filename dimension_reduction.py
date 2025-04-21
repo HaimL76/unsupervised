@@ -83,11 +83,26 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
     scaler = StandardScaler()
     df_scaled = scaler.fit_transform(df.select_dtypes(include=[np.number]))
 
+    opt_cluster_scores: list = []
+
     for reducer_index in range(len(dimension_reduction_methods)):
-        calculate_dimension_reduction(df_scaled, reducer_index, labels, target_column)
+        opt_cluster_scores = calculate_dimension_reduction(df_scaled, reducer_index, labels, target_column,
+                                      opt_cluster_scores=opt_cluster_scores)
+
+    if not os.path.exists('output'):
+        os.makedirs('output')
+
+    clusters_file_path = os.path.join('output', 'clusters.txt')
+
+    with open(clusters_file_path, 'w') as fwriter:
+        fwriter.write('reducer_display_name, clustering_display_name, opt_k, highest_score\n')
+
+        for tup in opt_cluster_scores:
+            fwriter.write(f'{tup[0]},{tup[1]},{tup[2]},{tup[3]}\n')
 
 
-def calculate_dimension_reduction(df_scaled, reducer_index, labels, target_column=None):
+def calculate_dimension_reduction(df_scaled, reducer_index, labels, target_column=None,
+                                  opt_cluster_scores: list = []):
     num_comps = 2
 
     # Run dimension reduce
@@ -111,11 +126,13 @@ def calculate_dimension_reduction(df_scaled, reducer_index, labels, target_colum
 
         cluster_display_name = clustering[str_display_name]
 
-        prefix = f'reducer = {reducer_display_name}, cluster = {cluster_display_name}'
-
-        clusters = calculate_clusters(arr, clustering, k_min=2, k_max=30, log_prefix=prefix)
+        clusters, opt_cluster_scores = calculate_clusters(arr, clustering, k_min=2, k_max=30,
+                                                          reducer_display_name=reducer_display_name,
+                                                          opt_cluster_scores=opt_cluster_scores)
 
         save_results_to_image(reducer_display_name, cluster_display_name, num_comps, labels, results, clusters)
+
+    return opt_cluster_scores
 
 
 def save_results_to_image(reducer_display_name, cluster_display_name, num_comps, labels, results, clusters):

@@ -1,5 +1,7 @@
 import math
 
+import os.path
+
 import numpy as np
 from sklearn.cluster import KMeans, DBSCAN
 from sklearn.mixture import GaussianMixture
@@ -68,10 +70,12 @@ clustering_options = [
 
 
 def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: int = 3,
-                       log_prefix: str = ''):
+                       reducer_display_name: str = '', opt_cluster_scores: list = []):
     clustering_method = clustering[str_method]
     clustering_params = clustering[str_params]
     clustering_display_name = clustering[str_display_name]
+
+    log_prefix = f'reducer = {reducer_display_name}, cluster = {clustering_display_name}'
 
     if clustering_method == DBSCAN and 'eps' in clustering_params:
         epsilon = calculate_epsilon(points)
@@ -130,6 +134,9 @@ def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: in
 
     print(f'{log_prefix}, opt k = {opt_k}, highest score = {highest_score}')
 
+    if opt_cluster_scores is not None:
+        opt_cluster_scores.append((reducer_display_name, clustering_display_name, opt_k, highest_score))
+
     if results:
         length_results = len(results)
 
@@ -175,4 +182,4 @@ def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: in
                 # Compute Convex Hull
                 cluster[1] = np.asarray(calculate_convex_hull(list_coords), dtype=float)
 
-    return list_clusters
+    return list_clusters, opt_cluster_scores
