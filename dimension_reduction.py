@@ -13,6 +13,8 @@ from utils import replace_extension, csv_to_dict, k_means
 
 from scipy.stats import f_oneway, kruskal
 
+p_value_threshold = 0.05
+
 str_reducer: str = 'reducer'
 str_params: str = 'params'
 str_n_components = 'n_components'
@@ -94,6 +96,7 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
                                                            opt_cluster_scores=opt_cluster_scores)
 
     list_stats: list = []
+    list_stats_test: list = []
 
     for entry in opt_cluster_scores:
         cluster_labels = entry['opt_labels']
@@ -117,6 +120,9 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
                 f_stat, p_anova = f_oneway(*list_clusters)
 
                 h_stat, p_kruskal = kruskal(*list_clusters)
+
+                if p_anova < p_value_threshold and p_kruskal < p_value_threshold:
+                    list_stats_test.append((reducer_display_name,clustering_display_name,col,p_anova,p_kruskal))
 
                 list_stats.append((reducer_display_name,clustering_display_name,col,f_stat,p_anova,h_stat,p_kruskal))
 
@@ -151,6 +157,19 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
 
                 fwriter.write(f'{str0}\n')
 
+    stats_test_file_path = os.path.join('output', 'stats-test.txt')
+
+    if len(list_stats_test) > 0:
+        with open(stats_test_file_path, 'w') as fwriter:
+            fwriter.write('reducer_display_name,clustering_display_name,col,p_anova,p_kruskal')
+
+            for tup in list_stats_test:
+                str_tup = [f'{obj}' for obj in tup]
+
+                str0 = ','.join(str_tup)
+
+                fwriter.write(f'{str0}\n')
+
 
 def calculate_dimension_reduction(df_scaled, reducer_index, labels, target_column=None,
                                   opt_cluster_scores: list = []):
@@ -179,7 +198,7 @@ def calculate_dimension_reduction(df_scaled, reducer_index, labels, target_colum
 
         cluster_display_name = clustering[str_display_name]
 
-        clusters, opt_cluster_scores = calculate_clusters(arr, clustering, k_min=2, k_max=22,
+        clusters, opt_cluster_scores = calculate_clusters(arr, clustering, k_min=2, k_max=10,
                                                           reducer_display_name=reducer_display_name,
                                                           opt_cluster_scores=opt_cluster_scores)
 

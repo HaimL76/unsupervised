@@ -64,7 +64,7 @@ def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: in
 
     opt_k: int = 0
     highest_score: float = None
-    opt_labels: None
+    opt_labels = None
 
     length_results: int = len(results)
 
