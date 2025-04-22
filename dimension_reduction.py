@@ -7,11 +7,14 @@ import umap
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler, LabelEncoder
-
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
 from clustering import calculate_clusters, clustering_options
 from utils import replace_extension, csv_to_dict, k_means
 
 from scipy.stats import f_oneway, kruskal
+import scikit_posthocs as sp
 
 p_value_threshold = 0.05
 
@@ -95,6 +98,9 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
         opt_cluster_scores = calculate_dimension_reduction(df_scaled, reducer_index, labels, target_column,
                                                            opt_cluster_scores=opt_cluster_scores)
 
+    if not os.path.exists('output'):
+        os.makedirs('output')
+
     list_stats: list = []
     list_stats_test: list = []
 
@@ -105,8 +111,30 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
         clustering_display_name = entry['clustering_display_name']
 
         if num_clusters > 0:
-            for col in df.columns:
-                arr = df.get(col).tolist()
+            class_folder = os.path.join('output', 'classification')
+
+            if not os.path.exists(class_folder):
+                os.makedirs(class_folder)
+
+            file_name = f'{reducer_display_name}-{clustering_display_name}.csv'
+
+            class_file = os.path.join(class_folder, file_name)
+
+            X = df_scaled
+            y = cluster_labels
+
+            clf = RandomForestClassifier(random_state=42)
+            clf.fit(X, y)
+
+            importances = clf.feature_importances_
+            feature_names = X.columns
+
+            importance_df = pd.Series(importances, index=feature_names).sort_values(ascending=False)
+
+            importance_df.to_csv(class_file)
+
+            for col in df_scaled.columns:
+                arr = df_scaled.get(col).tolist()
 
                 list_clusters = [[] for i in range(num_clusters)]
 
@@ -122,12 +150,17 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
                 h_stat, p_kruskal = kruskal(*list_clusters)
 
                 if p_anova < p_value_threshold and p_kruskal < p_value_threshold:
-                    list_stats_test.append((reducer_display_name,clustering_display_name,col,p_anova,p_kruskal))
+                    df = pd.DataFrame({
+                        'values': arr,
+                        'groups': cluster_labels
+                    })
 
-                list_stats.append((reducer_display_name,clustering_display_name,col,f_stat,p_anova,h_stat,p_kruskal))
+                    dunn_result = sp.posthoc_dunn(df, val_col='values', group_col='groups', p_adjust='bonferroni')
 
-    if not os.path.exists('output'):
-        os.makedirs('output')
+                    list_stats_test.append((reducer_display_name, clustering_display_name, col, p_anova, p_kruskal))
+
+                list_stats.append(
+                    (reducer_display_name, clustering_display_name, col, f_stat, p_anova, h_stat, p_kruskal))
 
     clusters_file_path = os.path.join('output', 'clusters.txt')
 
