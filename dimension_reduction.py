@@ -116,11 +116,9 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
 
                 f_stat, p_anova = f_oneway(*list_clusters)
 
-                list_stats.append((reducer_display_name,clustering_display_name,col,f_stat,p_anova))
+                h_stat, p_kruskal = kruskal(*list_clusters)
 
-                    #h_stat, p_kruskal = kruskal(*list_clusters)
-            ##anova_results.append((col, f_stat, p_anova))
-            ##kruskal_results.append((col, h_stat, p_kruskal))
+                list_stats.append((reducer_display_name,clustering_display_name,col,f_stat,p_anova,h_stat,p_kruskal))
 
     if not os.path.exists('output'):
         os.makedirs('output')
@@ -139,6 +137,19 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
             str = f'{reducer_display_name},{clustering_display_name},{opt_k},{highest_score}\n'
 
             fwriter.write(str)
+
+    stats_file_path = os.path.join('output', 'stats.txt')
+
+    if len(list_stats) > 0:
+        with open(stats_file_path, 'w') as fwriter:
+            fwriter.write('reducer_display_name, clustering_display_name,col,f_stat,p_anova,h_stat,p_kruskal')
+
+            for tup in list_stats:
+                str_tup = [f'{obj}' for obj in tup]
+
+                str0 = ','.join(str_tup)
+
+                fwriter.write(f'{str0}\n')
 
 
 def calculate_dimension_reduction(df_scaled, reducer_index, labels, target_column=None,
