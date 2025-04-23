@@ -116,11 +116,13 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
             if not os.path.exists(class_folder):
                 os.makedirs(class_folder)
 
-            file_name = f'{reducer_display_name}-{clustering_display_name}.csv'
+            file_name = f'{reducer_display_name}-{clustering_display_name}'
 
-            class_file = os.path.join(class_folder, file_name)
+            file_name_csv = f'{file_name}.csv'
 
-            X = df_scaled
+            class_file = os.path.join(class_folder, file_name_csv)
+
+            X = df
             y = cluster_labels
 
             clf = RandomForestClassifier(random_state=42)
@@ -133,8 +135,19 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
 
             importance_df.to_csv(class_file)
 
-            for col in df_scaled.columns:
-                arr = df_scaled.get(col).tolist()
+            file_name_image = f'{file_name}.png'
+
+            class_image_file = os.path.join(class_folder, file_name_image)
+
+            plt.figure(figsize=(10, 6))
+            importance_df.plot(kind='barh', color='teal')
+            plt.title("Feature Importance by Random Forest")
+            plt.xlabel("Importance")
+            plt.tight_layout()
+            plt.savefig(class_image_file, dpi=300)
+
+            for col in df.columns:
+                arr = df.get(col).tolist()
 
                 list_clusters = [[] for i in range(num_clusters)]
 
@@ -150,12 +163,12 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
                 h_stat, p_kruskal = kruskal(*list_clusters)
 
                 if p_anova < p_value_threshold and p_kruskal < p_value_threshold:
-                    df = pd.DataFrame({
+                    df0 = pd.DataFrame({
                         'values': arr,
                         'groups': cluster_labels
                     })
 
-                    dunn_result = sp.posthoc_dunn(df, val_col='values', group_col='groups', p_adjust='bonferroni')
+                    dunn_result = sp.posthoc_dunn(df0, val_col='values', group_col='groups', p_adjust='bonferroni')
 
                     list_stats_test.append((reducer_display_name, clustering_display_name, col, p_anova, p_kruskal))
 
@@ -181,7 +194,7 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
 
     if len(list_stats) > 0:
         with open(stats_file_path, 'w') as fwriter:
-            fwriter.write('reducer_display_name, clustering_display_name,col,f_stat,p_anova,h_stat,p_kruskal')
+            fwriter.write('reducer_display_name, clustering_display_name,col,f_stat,p_anova,h_stat,p_kruskal\n')
 
             for tup in list_stats:
                 str_tup = [f'{obj}' for obj in tup]
@@ -194,7 +207,7 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
 
     if len(list_stats_test) > 0:
         with open(stats_test_file_path, 'w') as fwriter:
-            fwriter.write('reducer_display_name,clustering_display_name,col,p_anova,p_kruskal')
+            fwriter.write('reducer_display_name,clustering_display_name,col,p_anova,p_kruskal\n')
 
             for tup in list_stats_test:
                 str_tup = [f'{obj}' for obj in tup]
