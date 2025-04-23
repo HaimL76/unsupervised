@@ -311,13 +311,15 @@ arr_files: list = [
     (r'ds\sleep_cycle_productivity.csv',),
     (r'ds\car_price_dataset.csv',),
     (r'ds\heart.csv',),
-    (r'ds\cardio_train.csv',';'),
-    (r'ds\schizophrenia_dataset.csv',)
+    (r'ds\cardio_train.csv', ';', ['id']),
+    (r'ds\schizophrenia_dataset.csv', ',', ['Patient_ID'])
 ]
 
-file_tuple: tuple = arr_files[-1]
+file_tuple: tuple = arr_files[-2]
+
 file_path: str = None
 file_separator: str = None
+columns_to_drop: list = None
 
 len_file_tuple = len(file_tuple)
 
@@ -327,9 +329,12 @@ if len_file_tuple > 0:
 if len_file_tuple > 1:
     file_separator = file_tuple[1]
 
+if len_file_tuple > 2:
+    columns_to_drop = file_tuple[2]
+
 if file_path:
     if file_separator is None:
         file_separator = ','
 
     calculate(file_path, target_column="Diagnosis", drop_target_column=False,
-              columns_to_drop=['Patient_ID'], csv_sep=file_separator)
+              columns_to_drop=columns_to_drop, csv_sep=file_separator)
