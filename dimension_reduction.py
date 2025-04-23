@@ -18,6 +18,8 @@ import scikit_posthocs as sp
 
 import seaborn as sns
 
+import matplotlib.patheffects as path_effects
+
 p_value_threshold = 0.05
 
 str_reducer: str = 'reducer'
@@ -129,7 +131,7 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
             df['cluster'] = cluster_labels
 
             cluster_summary = df.groupby('cluster').mean().round(2)
-            #print(cluster_summary)
+            # print(cluster_summary)
 
             plt.figure(figsize=(12, 6))
             sns.heatmap(cluster_summary, annot=True, cmap='coolwarm')
@@ -310,13 +312,27 @@ def save_results_to_image(reducer_display_name, cluster_display_name, num_comps,
         ax.set_xlabel(f'{reducer_display_name} Component 2')
         ax.set_xlabel(f'{reducer_display_name} Component 3')
 
-    for cluster in clusters:
+    len_clusters = len(clusters)
+
+    for i in range(len_clusters):
+        cluster = clusters[i]
+
         hull_points = cluster[1]
 
         if isinstance(hull_points, np.ndarray):
             shape = hull_points.shape
 
             if isinstance(shape, tuple) and len(shape) == 2:  # 3?
+                centroid = np.mean(hull_points, axis=0)
+
+                txt = plt.text(centroid[0], centroid[1], str(i), fontsize=22, color='lightblue',
+                               alpha=0.5, ha='center', va='center')
+
+                txt.set_path_effects([
+                    path_effects.Stroke(linewidth=3, foreground='black'),
+                    path_effects.Normal()
+                ])
+
                 # Plot polygon
                 plt.plot(hull_points[:, 0], hull_points[:, 1], 'b-', linewidth=2)  # , label='Polygon')
 
