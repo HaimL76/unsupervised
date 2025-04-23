@@ -161,7 +161,13 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
 
                 f_stat, p_anova = f_oneway(*list_clusters)
 
-                h_stat, p_kruskal = kruskal(*list_clusters)
+                h_stat = None
+                p_kruskal = None
+
+                try:
+                    h_stat, p_kruskal = kruskal(*list_clusters)
+                except Exception as e:
+                    _ = e
 
                 if p_anova < p_value_threshold and p_kruskal < p_value_threshold:
                     df0 = pd.DataFrame({
@@ -311,8 +317,10 @@ arr_files: list = [
     (r'ds\sleep_cycle_productivity.csv',),
     (r'ds\car_price_dataset.csv',),
     (r'ds\heart.csv',),
-    (r'ds\cardio_train.csv', ';', ['id']),
-    (r'ds\schizophrenia_dataset.csv', ',', ['Patient_ID'])
+    (r'ds\cardio_train.csv', ['id'], ';'),
+    (r'ds\cardio_data_processed.csv', ['id'],),
+    (r'ds\alzheimers_disease_data.csv', ['PatientID']),
+    (r'ds\schizophrenia_dataset.csv', ['Patient_ID'],)
 ]
 
 file_tuple: tuple = arr_files[-2]
@@ -327,10 +335,10 @@ if len_file_tuple > 0:
     file_path = file_tuple[0]
 
 if len_file_tuple > 1:
-    file_separator = file_tuple[1]
+    columns_to_drop = file_tuple[1]
 
 if len_file_tuple > 2:
-    columns_to_drop = file_tuple[2]
+    file_separator = file_tuple[2]
 
 if file_path:
     if file_separator is None:
