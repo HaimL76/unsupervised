@@ -16,6 +16,8 @@ from utils import replace_extension, csv_to_dict, k_means
 from scipy.stats import f_oneway, kruskal
 import scikit_posthocs as sp
 
+import seaborn as sns
+
 p_value_threshold = 0.05
 
 str_reducer: str = 'reducer'
@@ -119,6 +121,22 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
                 os.makedirs(class_folder)
 
             file_name = f'{reducer_display_name}-{clustering_display_name}'
+
+            file_name_heat = f'{file_name}-heatmap.png'
+
+            class_file_heat = os.path.join(class_folder, file_name_heat)
+
+            df['cluster'] = cluster_labels
+
+            cluster_summary = df.groupby('cluster').mean().round(2)
+            #print(cluster_summary)
+
+            plt.figure(figsize=(12, 6))
+            sns.heatmap(cluster_summary, annot=True, cmap='coolwarm')
+            plt.title("Cluster Feature Means")
+            plt.savefig(class_file_heat, dpi=300)
+
+            df.drop(columns=['cluster'])
 
             file_name_csv = f'{file_name}.txt'
 
