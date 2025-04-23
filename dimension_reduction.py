@@ -34,9 +34,10 @@ dimension_reduction_methods = [
 ]
 
 
-def calculate(csv_file, target_column=None, drop_target_column: bool = True, columns_to_drop: list = None):
+def calculate(csv_file, target_column=None, drop_target_column: bool = True, columns_to_drop: list = None,
+              csv_sep=','):
     # Load data
-    df = pd.read_csv(csv_file)
+    df = pd.read_csv(csv_file, sep=csv_sep)
 
     trans_file = replace_extension(csv_file, '.trans')
 
@@ -304,15 +305,31 @@ def save_results_to_image(reducer_display_name, cluster_display_name, num_comps,
 
 # Example usage:
 arr_files: list = [
-    r'ds\sleep_deprivation_dataset_detailed.csv',
-    r'ds\Bank_Transaction_Fraud_Detection.csv',
-    r'ds\sales_data.csv',
-    r'ds\sleep_cycle_productivity.csv',
-    r'ds\car_price_dataset.csv',
-    r'ds\heart.csv',
-    r'ds\schizophrenia_dataset.csv'
+    (r'ds\sleep_deprivation_dataset_detailed.csv',),
+    (r'ds\Bank_Transaction_Fraud_Detection.csv',),
+    (r'ds\sales_data.csv',),
+    (r'ds\sleep_cycle_productivity.csv',),
+    (r'ds\car_price_dataset.csv',),
+    (r'ds\heart.csv',),
+    (r'ds\cardio_train.csv',';'),
+    (r'ds\schizophrenia_dataset.csv',)
 ]
 
-file_path: str = arr_files[-3]
+file_tuple: tuple = arr_files[-1]
+file_path: str = None
+file_separator: str = None
 
-calculate(file_path, target_column="Diagnosis", drop_target_column=False, columns_to_drop=['Patient_ID'])
+len_file_tuple = len(file_tuple)
+
+if len_file_tuple > 0:
+    file_path = file_tuple[0]
+
+if len_file_tuple > 1:
+    file_separator = file_tuple[1]
+
+if file_path:
+    if file_separator is None:
+        file_separator = ','
+
+    calculate(file_path, target_column="Diagnosis", drop_target_column=False,
+              columns_to_drop=['Patient_ID'], csv_sep=file_separator)
