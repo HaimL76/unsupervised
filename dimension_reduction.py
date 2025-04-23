@@ -35,7 +35,7 @@ dimension_reduction_methods = [
 
 
 def calculate(csv_file, target_column=None, drop_target_column: bool = True, columns_to_drop: list = None,
-              csv_sep=','):
+              csv_sep=',', k_min=2, k_max=22):
     # Load data
     df = pd.read_csv(csv_file, sep=csv_sep)
 
@@ -97,7 +97,8 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
 
     for reducer_index in range(len_dimension_reduction_methods):
         opt_cluster_scores = calculate_dimension_reduction(df_scaled, reducer_index, labels, target_column,
-                                                           opt_cluster_scores=opt_cluster_scores)
+                                                           opt_cluster_scores=opt_cluster_scores,
+                                                           k_min=k_min, k_max=k_max)
 
     if not os.path.exists('output'):
         os.makedirs('output')
@@ -225,7 +226,7 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
 
 
 def calculate_dimension_reduction(df_scaled, reducer_index, labels, target_column=None,
-                                  opt_cluster_scores: list = []):
+                                  opt_cluster_scores: list = [], k_min=2, k_max=22):
     num_comps = 2
 
     # Run dimension reduce
@@ -251,7 +252,7 @@ def calculate_dimension_reduction(df_scaled, reducer_index, labels, target_colum
 
         cluster_display_name = clustering[str_display_name]
 
-        clusters, opt_cluster_scores = calculate_clusters(arr, clustering, k_min=2, k_max=10,
+        clusters, opt_cluster_scores = calculate_clusters(arr, clustering, k_min=k_min, k_max=k_max,
                                                           reducer_display_name=reducer_display_name,
                                                           opt_cluster_scores=opt_cluster_scores)
 
@@ -320,6 +321,8 @@ arr_files: list = [
     (r'ds\cardio_train.csv', ['id'], ';'),
     (r'ds\cardio_data_processed.csv', ['id'],),
     (r'ds\alzheimers_disease_data.csv', ['PatientID']),
+    (r'ds\health_data.csv', ['id']),
+    (r'ds\UserCarData.csv', ['Sales_ID'], ',', (2, 40)),
     (r'ds\schizophrenia_dataset.csv', ['Patient_ID'],)
 ]
 
@@ -328,6 +331,8 @@ file_tuple: tuple = arr_files[-2]
 file_path: str = None
 file_separator: str = None
 columns_to_drop: list = None
+k_min = 2
+k_max = 22
 
 len_file_tuple = len(file_tuple)
 
@@ -340,9 +345,17 @@ if len_file_tuple > 1:
 if len_file_tuple > 2:
     file_separator = file_tuple[2]
 
+if len_file_tuple > 3:
+    k_tup = file_tuple[3]
+
+    if isinstance(k_tup, tuple) and len(k_tup) == 2:
+        k_min = k_tup[0]
+        k_max = k_tup[1]
+
 if file_path:
     if file_separator is None:
         file_separator = ','
 
     calculate(file_path, target_column="Diagnosis", drop_target_column=False,
-              columns_to_drop=columns_to_drop, csv_sep=file_separator)
+              columns_to_drop=columns_to_drop, csv_sep=file_separator,
+              k_min=k_min, k_max=k_max)
