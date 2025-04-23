@@ -48,7 +48,14 @@ For the DBSCAN algorithm, which is not based on calculating centroids, I have us
 \begin{enumerate}
     \item Columns to Drop
 
-    Many datasets, including the dataset I was working with, have columns that do not carry any real measurable data, specifically the numeric identifier of the data points, usually it will be the first column. Such columns are not only irrelevant for our analysis, they also add noise, and in order to avoid using them in the process of learning, I added an input parameter to the process, telling it to drop specific columns. 
+    Many datasets, including the dataset I was working with, have columns that do not carry any real measurable data, specifically the numeric identifier of the data points, usually it will be the first column. Such columns are not only irrelevant for our analysis, they also add noise, and in order to avoid using them in the process of learning, I added an optional input parameter to the process, telling it to drop specific columns.
+    \item Target Columns
+
+    While we are performing a supervised machine learning in this project, which means that we find general patterns and relations between data points, without considering their target labels, but as an auxiliary learning tool, it may be somewhat useful to identify a column as a label, or target column, and use it as an aid of visualization. For this purpose, I also added an optional input parameter. As a side effect of this, there is the next remark.
+
+    \item Cluster Visualization
+
+    Looking at different examples, there seems to be a tendency to visualize the different clusters using different colors. However, I found that it would be useful for my analysis to visualize the index (cluster label) of each cluster, next to the middle point of the cluster, while using different colors to visualize the value of the target column, as mentioned in the previous remark.
 \end{enumerate}
 
 \url{https://www.overleaf.com/contact}.
