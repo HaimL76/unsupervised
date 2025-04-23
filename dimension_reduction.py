@@ -118,7 +118,7 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
 
             file_name = f'{reducer_display_name}-{clustering_display_name}'
 
-            file_name_csv = f'{file_name}.csv'
+            file_name_csv = f'{file_name}.txt'
 
             class_file = os.path.join(class_folder, file_name_csv)
 
@@ -260,7 +260,13 @@ def save_results_to_image(reducer_display_name, cluster_display_name, num_comps,
     plt.title(f'{reducer_display_name} simple {num_comps}D scatter plot')
 
     label_encoder = LabelEncoder()
-    labels_encoded = label_encoder.fit_transform(labels)
+
+    labels_encoded = labels  # default value is the original
+
+    try:
+        labels_encoded = label_encoder.fit_transform(labels)
+    except Exception as e:
+        _ = e
 
     # Creating plot
     if num_comps == 2:
@@ -303,9 +309,10 @@ arr_files: list = [
     r'ds\sales_data.csv',
     r'ds\sleep_cycle_productivity.csv',
     r'ds\car_price_dataset.csv',
+    r'ds\heart.csv',
     r'ds\schizophrenia_dataset.csv'
 ]
 
-file_path: str = arr_files[-1]
+file_path: str = arr_files[-3]
 
 calculate(file_path, target_column="Diagnosis", drop_target_column=False, columns_to_drop=['Patient_ID'])
