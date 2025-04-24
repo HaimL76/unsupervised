@@ -9,6 +9,8 @@ from sklearn.metrics import silhouette_score
 
 from convex_hull import calculate_convex_hull
 
+from calc_statistics import calculate_statistics_for_clusters
+
 str_method: str = 'method'
 str_params: str = 'params'
 str_display_name: str = 'display_name'
@@ -34,6 +36,7 @@ def calculate_epsilon(points: np.ndarray, k=2):
 
     return math.sqrt(len_x * len_x + len_y * len_y)
 
+
 k_min_default = 3
 
 clustering_options = [
@@ -46,8 +49,9 @@ clustering_options = [
 ]
 
 
-def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: int = 3,
-                       reducer_display_name: str = '', opt_cluster_scores: list = []):
+def calculate_clusters(df_original, points: np.ndarray, clustering, k_min: int = 3, k_max: int = 3,
+                       reducer_display_name: str = '', opt_cluster_scores: list = [],
+                       list_stats: list = [], list_stats_test: list = []):
     clustering_method = clustering[str_method]
     clustering_params = clustering[str_params]
     clustering_display_name = clustering[str_display_name]
@@ -111,13 +115,27 @@ def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: in
     print(f'{log_prefix}, opt k = {opt_k}, highest score = {highest_score}')
 
     if opt_cluster_scores is not None:
-        opt_cluster_scores.append({
+        opt_cluster_score = {
             'reducer_display_name': reducer_display_name,
             'clustering_display_name': clustering_display_name,
             'opt_k': opt_k,
             'highest_score': highest_score,
             'opt_labels': opt_labels
-        })
+        }
+
+        opt_cluster_scores.append(opt_cluster_score)
+
+        if not os.path.exists('output'):
+            os.makedirs('output')
+
+        list_stats: list = []
+        list_stats_test: list = []
+
+        path_components = ['classification']
+
+        list_stats, list_stats_test = calculate_statistics_for_clusters(df_original, opt_cluster_score,
+                                                                        list_stats, list_stats_test,
+                                                                        path_components=path_components)
 
     list_clusters = []
 
@@ -161,4 +179,4 @@ def calculate_clusters(points: np.ndarray, clustering, k_min: int = 3, k_max: in
                 # Compute Convex Hull
                 cluster[1] = np.asarray(calculate_convex_hull(list_coords), dtype=float)
 
-    return list_clusters, opt_cluster_scores
+    return list_clusters, opt_cluster_scores, list_stats, list_stats_test

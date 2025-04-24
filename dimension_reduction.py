@@ -10,7 +10,6 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
-from clustering import calculate_clusters, clustering_options
 from utils import replace_extension, csv_to_dict, k_means
 
 from scipy.stats import f_oneway, kruskal
@@ -22,7 +21,9 @@ import matplotlib.patheffects as path_effects
 
 import shutil
 
-p_value_threshold = 0.05
+from clustering import calculate_clusters, clustering_options
+
+from calc_statistics import calculate_statistics_for_clusters
 
 str_reducer: str = 'reducer'
 str_params: str = 'params'
@@ -40,150 +41,44 @@ dimension_reduction_methods = [
 ]
 
 
-def calculate_statistics_for_clusters(df, entry, list_stats: list, list_stats_test: list,
-                                      path_components: list = ['classification']):
-    cluster_labels = entry['opt_labels']
-    num_clusters = entry['opt_k']
-    reducer_display_name = entry['reducer_display_name']
-    clustering_display_name = entry['clustering_display_name']
-
-    if num_clusters > 0:
-        is_valid_path_components = isinstance(path_components, list) and len(path_components) > 0
-
-        if not is_valid_path_components:
-            path_components = ['classification']
-
-        class_folder = 'output'
-
-        for component in path_components:
-            if component is not None:
-                class_folder = os.path.join(class_folder, component)
-
-                if not os.path.exists(class_folder):
-                    os.makedirs(class_folder)
-
-        file_name = f'{reducer_display_name}-{clustering_display_name}'
-
-        file_name_heat = f'{file_name}-heatmap.png'
-
-        class_file_heat = os.path.join(class_folder, file_name_heat)
-
-        df['cluster'] = cluster_labels
-
-        cluster_summary = df.groupby('cluster').mean().round(2)
-        # print(cluster_summary)
-
-        plt.figure(figsize=(12, 6))
-        sns.heatmap(cluster_summary, annot=True, cmap='coolwarm')
-        plt.title("Cluster Feature Means")
-        plt.savefig(class_file_heat, dpi=300)
-
-        df.drop(columns=['cluster'])
-
-        file_name_csv = f'{file_name}.txt'
-
-        class_file = os.path.join(class_folder, file_name_csv)
-
-        X = df
-        y = cluster_labels
-
-        clf = RandomForestClassifier(random_state=42)
-        clf.fit(X, y)
-
-        importances = clf.feature_importances_
-        feature_names = X.columns
-
-        importance_df = pd.Series(importances, index=feature_names).sort_values(ascending=False)
-
-        importance_df.to_csv(class_file)
-
-        file_name_image = f'{file_name}.png'
-
-        class_image_file = os.path.join(class_folder, file_name_image)
-
-        plt.figure(figsize=(10, 6))
-        importance_df.plot(kind='barh', color='teal')
-        plt.title("Feature Importance by Random Forest")
-        plt.xlabel("Importance")
-        plt.tight_layout()
-        plt.savefig(class_image_file, dpi=300)
-
-        for col in df.columns:
-            arr = df.get(col).tolist()
-
-            list_clusters = [[] for i in range(num_clusters)]
-
-            for i in range(len(arr)):
-                label = cluster_labels[i]
-
-                if label < len(list_clusters):
-                    cluster = list_clusters[label]
-                    cluster.append(arr[i])
-
-            f_stat, p_anova = f_oneway(*list_clusters)
-
-            h_stat = None
-            p_kruskal = None
-
-            try:
-                h_stat, p_kruskal = kruskal(*list_clusters)
-            except Exception as e:
-                _ = e
-
-            if p_anova < p_value_threshold and p_kruskal < p_value_threshold:
-                df0 = pd.DataFrame({
-                    'values': arr,
-                    'groups': cluster_labels
-                })
-
-                dunn_result = sp.posthoc_dunn(df0, val_col='values', group_col='groups', p_adjust='bonferroni')
-
-                list_stats_test.append((reducer_display_name, clustering_display_name, col, p_anova, p_kruskal))
-
-            list_stats.append(
-                (reducer_display_name, clustering_display_name, col, f_stat, p_anova, h_stat, p_kruskal))
-
-    return list_stats, list_stats_test
-
-
 def calculate(csv_file, target_column=None, drop_target_column: bool = True, columns_to_drop: list = None,
               csv_sep=',', k_min=2, k_max=22):
     if os.path.exists('output'):
         shutil.rmtree('output')
 
     # Load data
-    df = pd.read_csv(csv_file, sep=csv_sep)
+    df_original = pd.read_csv(csv_file, sep=csv_sep)
 
     trans_file = replace_extension(csv_file, '.trans')
 
     if os.path.exists(trans_file):
         column_map: dict = csv_to_dict(trans_file)
 
-        df.rename(columns=column_map, inplace=True)
+        df_original.rename(columns=column_map, inplace=True)
 
     if isinstance(columns_to_drop, list) and len(columns_to_drop) > 0:
         for col in columns_to_drop:
-            if col in df.columns:
-                df = df.drop(columns=[col])
+            if col in df_original.columns:
+                df_original = df_original.drop(columns=[col])
 
-    column_names = df.keys()
+    column_names = df_original.keys()
 
     encoder = LabelEncoder()
 
     for col_name in column_names:
-        col = df[col_name]
-        df[col_name] = encoder.fit_transform(col)
+        col = df_original[col_name]
+        df_original[col_name] = encoder.fit_transform(col)
 
     # If target_column is provided, extract labels
-    if target_column and target_column in df.columns:
-        labels = df[target_column]
+    if target_column and target_column in df_original.columns:
+        labels = df_original[target_column]
 
         if drop_target_column:
-            df = df.drop(columns=[target_column])
+            df = df_original.drop(columns=[target_column])
     else:
         labels = None
 
-    column_names = df.keys()
+    column_names = df_original.keys()
 
     if not os.path.exists('output'):
         os.makedirs('output')
@@ -193,8 +88,8 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
     with open(features_file_path, 'w') as fwriter:
         fwriter.write('feature,mean,std,min,max\n')
 
-        for col in df.columns:
-            arr0 = df[col]
+        for col in df_original.columns:
+            arr0 = df_original[col]
             m = arr0.mean()
             s = arr0.std()
             mn = arr0.min()
@@ -204,37 +99,26 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
 
     # Standardize features
     scaler = StandardScaler()
-    df_scaled = scaler.fit_transform(df.select_dtypes(include=[np.number]))
+    df_scaled = scaler.fit_transform(df_original.select_dtypes(include=[np.number]))
 
     opt_cluster_scores: list = []
     most_optimal_cluster = None
 
     len_dimension_reduction_methods = len(dimension_reduction_methods)
 
-    for reducer_index in range(len_dimension_reduction_methods):
-        opt_cluster_scores, most_optimal_cluster = calculate_dimension_reduction(df_scaled, reducer_index,
-                                                                                 labels, target_column,
-                                                                                 opt_cluster_scores=opt_cluster_scores,
-                                                                                 most_optimal_cluster=most_optimal_cluster,
-                                                                                 k_min=k_min, k_max=k_max)
-
-    if not os.path.exists('output'):
-        os.makedirs('output')
-
     list_stats: list = []
     list_stats_test: list = []
 
-    path_components = ['classification']
-
-    for entry in opt_cluster_scores:
-        list_stats, list_stats_test = calculate_statistics_for_clusters(df, entry, list_stats,
-                                                                        list_stats_test,
-                                                                        path_components=path_components)
+    for reducer_index in range(len_dimension_reduction_methods):
+        opt_cluster_scores, most_optimal_cluster = calculate_dimension_reduction(
+            df_original, df_scaled, reducer_index, labels, target_column,
+            opt_cluster_scores=opt_cluster_scores, most_optimal_cluster=most_optimal_cluster,
+            k_min=k_min, k_max=k_max, list_stats=list_stats, list_stats_test=list_stats_test)
 
     if most_optimal_cluster is not None:
         path_components = ['classification', 'highest-score-cluster']
 
-        _, _ = calculate_statistics_for_clusters(df, most_optimal_cluster, [], [],
+        _, _ = calculate_statistics_for_clusters(df_original, most_optimal_cluster, [], [],
                                                  path_components=path_components)
 
     clusters_file_path = os.path.join('output', 'clusters.txt')
@@ -279,9 +163,10 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
                 fwriter.write(f'{str0}\n')
 
 
-def calculate_dimension_reduction(df_scaled, reducer_index, labels, target_column=None,
-                                  opt_cluster_scores: list = [], most_optimal_cluster=None,
-                                  k_min=2, k_max=22):
+def calculate_dimension_reduction(
+        df_original, df_scaled, reducer_index, labels, target_column=None,
+        opt_cluster_scores: list = [], most_optimal_cluster=None,
+        k_min=2, k_max=22, list_stats: list = [], list_stats_test: list = []):
     num_comps = 2
 
     # Run dimension reduce
@@ -302,14 +187,19 @@ def calculate_dimension_reduction(df_scaled, reducer_index, labels, target_colum
 
     len_clustering_options = len(clustering_options)
 
+    list_stats: list = []
+    list_stats_test: list = []
+
     for cluster_index in range(len_clustering_options):
         clustering = clustering_options[cluster_index]
 
         cluster_display_name = clustering[str_display_name]
 
-        clusters, opt_cluster_scores = calculate_clusters(arr, clustering, k_min=k_min, k_max=k_max,
-                                                          reducer_display_name=reducer_display_name,
-                                                          opt_cluster_scores=opt_cluster_scores)
+        clusters, opt_cluster_scores, list_stats, list_stats_test = calculate_clusters(
+            df_original, arr, clustering, k_min=k_min, k_max=k_max,
+            reducer_display_name=reducer_display_name,
+            opt_cluster_scores=opt_cluster_scores,
+            list_stats=list_stats, list_stats_test=list_stats_test)
 
         if isinstance(opt_cluster_scores, list) and len(opt_cluster_scores) > 0:
             new_opt_score = opt_cluster_scores[-1]
