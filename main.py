@@ -45,7 +45,7 @@ def main():
             k_max = k_tup[1]
 
     if len_file_tuple > 4:
-        str_target_column = file_tuple[4]
+        target_column = file_tuple[4]
 
     if file_path:
         if file_separator is None:
