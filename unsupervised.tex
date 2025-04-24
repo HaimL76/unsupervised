@@ -23,6 +23,18 @@
 Your abstract.
 \end{abstract}
 
+\section{Introduction}
+\subsection{General Explanation}
+Schizophrenia is a serious mental illness that affects the patient and disables him or her from performing as a fully capable valid person. The question of why someone has Schizophrenia does not always have a decisive answer, because there are many factors that can cause this situation, genetic and environmental. Research in this field can help find helpful ways to tackle this harsh situation, because, if we find several factors which are statistically observed as common among people who have Schizophrenia, especially if we find the most common ones, then neutralizing some of these factors can help in preventing the abruption of this mental condition. Another major question, which we shall also concentrate in, is, when we have a patient diagnosed with Schizophrenia, what must we consider regarding his or her own personal safety and well-being.
+\subsection{This Paper Research}
+I have found in Kaggle a dataset containing data collected among people in Turkey. The dataset contains several data features that I would like to divide to three categories:
+\begin{enumerate}
+    \item Features that are basic to any research on human beings, such as age and gender.
+    \item Features that directly correspond to the subject of Schizophrenia, above all is the diagnosis itself (diagnosed / not diagnosed as Schizophrenic), as well as mental and behavioral tests.
+    \item Physical / Behavioral / Environmental features, that are suspected or known as factors for Schizophrenia, whether their influence is positive (having more of) or negative (having less of).
+\end{enumerate}
+\subsection{Main Question}
+
 \section{Methods}
 \subsection{Dimensionality Reduction}
 I used three methods for the reduction of dimensionality.
@@ -51,11 +63,15 @@ For the DBSCAN algorithm, which is not based on calculating centroids, I have us
     Many datasets, including the dataset I was working with, have columns that do not carry any real measurable data, specifically the numeric identifier of the data points, usually it will be the first column. Such columns are not only irrelevant for our analysis, they also add noise, and in order to avoid using them in the process of learning, I added an optional input parameter to the process, telling it to drop specific columns.
     \item Target Columns
 
-    While we are performing a supervised machine learning in this project, which means that we find general patterns and relations between data points, without considering their target labels, but as an auxiliary learning tool, it may be somewhat useful to identify a column as a label, or target column, and use it as an aid of visualization. For this purpose, I also added an optional input parameter. As a side effect of this, there is the next remark.
+    As mentioned earlier, our dataset contains features that are directly related to the subject of our study, meaning the diagnosis and the behavioral tests that support it. Thus, it would be useful to identify a target column, in our case the diagnosis, and use it as the pivot of our research, since we want to find ties (or strict differences) between the features that are common among people who are diagnosed as Schizophrenic. For this purpose, I also added an optional input parameter. As a side effect of this, there is the next remark.
 
     \item Cluster Visualization
 
     Looking at different examples, there seems to be a tendency to visualize the different clusters using different colors. However, I found that it would be useful for my analysis to visualize the index (cluster label) of each cluster, next to the middle point of the cluster, while using different colors to visualize the value of the target column, as mentioned in the previous remark.
+
+    \item Language Barrier
+    
+    As specified above, the dataset was collected among people in Turkey. This means that the names of the columns are in Turkish. I have added a small mechanism to tackle this (after trying to add a dynamic call to Google Translate API, with no success), simply by preparing a .csv translation file, and have the code read it and substitute the Turkish names with the English names.
 \end{enumerate}
 
 \url{https://www.overleaf.com/contact}.
