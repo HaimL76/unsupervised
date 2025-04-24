@@ -208,10 +208,10 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
 
     for reducer_index in range(len_dimension_reduction_methods):
         opt_cluster_scores, most_optimal_cluster = calculate_dimension_reduction(df_scaled, reducer_index,
-                                                                               labels, target_column,
-                                                                               opt_cluster_scores=opt_cluster_scores,
-                                                                               most_optimal_cluster=most_optimal_cluster,
-                                                                               k_min=k_min, k_max=k_max)
+                                                                                 labels, target_column,
+                                                                                 opt_cluster_scores=opt_cluster_scores,
+                                                                                 most_optimal_cluster=most_optimal_cluster,
+                                                                                 k_min=k_min, k_max=k_max)
 
     if not os.path.exists('output'):
         os.makedirs('output')
@@ -225,6 +225,12 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
         list_stats, list_stats_test = calculate_statistics_for_clusters(df, entry, list_stats,
                                                                         list_stats_test,
                                                                         path_components=path_components)
+
+    if most_optimal_cluster is not None:
+        path_components = ['classification', 'highest-score-cluster']
+
+        _, _ = calculate_statistics_for_clusters(df, most_optimal_cluster, [], [],
+                                                 path_components=path_components)
 
     clusters_file_path = os.path.join('output', 'clusters.txt')
 
@@ -398,7 +404,7 @@ arr_files: list = [
     (r'ds\alzheimers_disease_data.csv', ['PatientID']),
     (r'ds\health_data.csv', ['id']),
     (r'ds\UserCarData.csv', ['Sales_ID'], ',', (2, 40), 'sold'),
-    (r'ds\schizophrenia_dataset.csv', ['Patient_ID'], ',', (2, 5), 'Diagnosis')
+    (r'ds\schizophrenia_dataset.csv', ['Patient_ID'], ',', (2, 10), 'Diagnosis')
 ]
 
 file_tuple: tuple = arr_files[-1]
