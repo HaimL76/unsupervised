@@ -38,17 +38,27 @@ dimension_reduction_methods = [
 ]
 
 
-def calculate_statistics_for_clusters(df, entry, list_stats: list, list_stats_test: list):
+def calculate_statistics_for_clusters(df, entry, list_stats: list, list_stats_test: list,
+                                      path_components: list = ['classification']):
     cluster_labels = entry['opt_labels']
     num_clusters = entry['opt_k']
     reducer_display_name = entry['reducer_display_name']
     clustering_display_name = entry['clustering_display_name']
 
     if num_clusters > 0:
-        class_folder = os.path.join('output', 'classification')
+        is_valid_path_components = isinstance(path_components, list) and len(path_components) > 0
 
-        if not os.path.exists(class_folder):
-            os.makedirs(class_folder)
+        if not is_valid_path_components:
+            path_components = ['classification']
+
+        class_folder = 'output'
+
+        for component in path_components:
+            if component is not None:
+                class_folder = os.path.join(class_folder, component)
+
+                if not os.path.exists(class_folder):
+                    os.makedirs(class_folder)
 
         file_name = f'{reducer_display_name}-{clustering_display_name}'
 
@@ -209,9 +219,12 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
     list_stats: list = []
     list_stats_test: list = []
 
+    path_components = ['classification']
+
     for entry in opt_cluster_scores:
         list_stats, list_stats_test = calculate_statistics_for_clusters(df, entry, list_stats,
-                                                                        list_stats_test)
+                                                                        list_stats_test,
+                                                                        path_components=path_components)
 
     clusters_file_path = os.path.join('output', 'clusters.txt')
 
