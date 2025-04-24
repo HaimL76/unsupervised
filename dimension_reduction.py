@@ -96,13 +96,16 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
     df_scaled = scaler.fit_transform(df.select_dtypes(include=[np.number]))
 
     opt_cluster_scores: list = []
+    most_optimal_cluster = None
 
     len_dimension_reduction_methods = len(dimension_reduction_methods)
 
     for reducer_index in range(len_dimension_reduction_methods):
-        opt_cluster_scores = calculate_dimension_reduction(df_scaled, reducer_index, labels, target_column,
-                                                           opt_cluster_scores=opt_cluster_scores,
-                                                           k_min=k_min, k_max=k_max)
+        opt_cluster_scores, most_optimal_cluster = calculate_dimension_reduction(df_scaled, reducer_index,
+                                                                               labels, target_column,
+                                                                               opt_cluster_scores=opt_cluster_scores,
+                                                                               most_optimal_cluster=most_optimal_cluster,
+                                                                               k_min=k_min, k_max=k_max)
 
     if not os.path.exists('output'):
         os.makedirs('output')
@@ -246,7 +249,8 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
 
 
 def calculate_dimension_reduction(df_scaled, reducer_index, labels, target_column=None,
-                                  opt_cluster_scores: list = [], k_min=2, k_max=22):
+                                  opt_cluster_scores: list = [], most_optimal_cluster=None,
+                                  k_min=2, k_max=22):
     num_comps = 2
 
     # Run dimension reduce
@@ -276,9 +280,22 @@ def calculate_dimension_reduction(df_scaled, reducer_index, labels, target_colum
                                                           reducer_display_name=reducer_display_name,
                                                           opt_cluster_scores=opt_cluster_scores)
 
+        if isinstance(opt_cluster_scores, list) and len(opt_cluster_scores) > 0:
+            new_opt_score = opt_cluster_scores[-1]
+
+            if most_optimal_cluster is None:
+                most_optimal_cluster = new_opt_score
+
+            existing_highest_score = most_optimal_cluster['highest_score']
+
+            new_highest_score = new_opt_score['highest_score']
+
+            if new_highest_score > existing_highest_score:
+                most_optimal_cluster = new_opt_score
+
         save_results_to_image(reducer_display_name, cluster_display_name, num_comps, labels, results, clusters)
 
-    return opt_cluster_scores
+    return opt_cluster_scores, most_optimal_cluster
 
 
 def save_results_to_image(reducer_display_name, cluster_display_name, num_comps, labels, results, clusters):
@@ -364,10 +381,10 @@ file_tuple: tuple = arr_files[-1]
 
 file_path: str = None
 file_separator: str = None
-columns_to_drop: list = None
-k_min = 2
-k_max = 22
-target_column: str = None
+list_columns_to_drop: list = None
+num_k_min = 2
+num_k_max = 22
+str_target_column: str = None
 
 len_file_tuple = len(file_tuple)
 
@@ -375,7 +392,7 @@ if len_file_tuple > 0:
     file_path = file_tuple[0]
 
 if len_file_tuple > 1:
-    columns_to_drop = file_tuple[1]
+    list_columns_to_drop = file_tuple[1]
 
 if len_file_tuple > 2:
     file_separator = file_tuple[2]
@@ -384,16 +401,16 @@ if len_file_tuple > 3:
     k_tup = file_tuple[3]
 
     if isinstance(k_tup, tuple) and len(k_tup) == 2:
-        k_min = k_tup[0]
-        k_max = k_tup[1]
+        num_k_min = k_tup[0]
+        num_k_max = k_tup[1]
 
 if len_file_tuple > 4:
-    target_column = file_tuple[4]
+    str_target_column = file_tuple[4]
 
 if file_path:
     if file_separator is None:
         file_separator = ','
 
-    calculate(file_path, target_column=target_column, drop_target_column=False,
-              columns_to_drop=columns_to_drop, csv_sep=file_separator,
-              k_min=k_min, k_max=k_max)
+    calculate(file_path, target_column=str_target_column, drop_target_column=False,
+              columns_to_drop=list_columns_to_drop, csv_sep=file_separator,
+              k_min=num_k_min, k_max=num_k_max)
