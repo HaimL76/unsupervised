@@ -2,3 +2,5 @@
 *.png
 *.pyc
 *.csv
+!ds/*.csv
+!requirements.txt

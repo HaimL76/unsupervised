@@ -20,6 +20,8 @@ import seaborn as sns
 
 import matplotlib.patheffects as path_effects
 
+import shutil
+
 p_value_threshold = 0.05
 
 str_reducer: str = 'reducer'
@@ -146,6 +148,9 @@ def calculate_statistics_for_clusters(df, entry, list_stats: list, list_stats_te
 
 def calculate(csv_file, target_column=None, drop_target_column: bool = True, columns_to_drop: list = None,
               csv_sep=',', k_min=2, k_max=22):
+    if os.path.exists('output'):
+        shutil.rmtree('output')
+
     # Load data
     df = pd.read_csv(csv_file, sep=csv_sep)
 
