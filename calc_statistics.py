@@ -235,7 +235,7 @@ def calculate_statistics_on_clusters_by_target(df, entry, pivot_column, threshol
 
             list_stats.append((reducer_display_name, clustering_display_name, target_column, f_stat, p_anova))
 
-            if p_anova < 0.05:
+            if p_anova is not None and p_anova < 0.05:
                 _ = 0
         _ = 0
 
