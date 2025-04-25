@@ -222,7 +222,7 @@ def calculate_statistics_on_clusters_by_target(df, entry, pivot_column, threshol
 
                     cluster = dict_clusters[label]
 
-                    cluster.append(arr[i])
+                    cluster.append(arr[j])
 
             _ = 0
         _ = 0
