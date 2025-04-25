@@ -1,5 +1,5 @@
 \documentclass{article}
-
+\usepackage{subfigure}
 % Language setting
 % Replace `english' with e.g. `spanish' to change the document language
 \usepackage[english]{babel}
@@ -35,6 +35,8 @@ I have found in Kaggle a dataset containing data collected among people in Turke
 \end{enumerate}
 \subsection{Main Question}
 One major question, regarding people diagnosed as Schizophrenic, is whether they are suicidal or not. The danger of having a person committing suicide can dictate the use of extreme safety measures, such as using heavy drugs or straitjackets. But if we can identify features that distinguish between different people who have Schizophrenia, we can avoid using those measures, and keep them only for people who share features that are highly related to being suicidal. 
+For instance, since committing suicide is an act of self-violence, we would expect this to be less common in females than in males. Also, we can expect this to be more common in people who are addicted to drugs, which usually increase the violent tendencies of the person consuming them.
+This question arose directly from the unsupervised data analysis, as shall be explained later.
 \section{Methods}
 \subsection{Dimensionality Reduction}
 I used three methods for the reduction of dimensionality.
@@ -73,6 +75,27 @@ For the DBSCAN algorithm, which is not based on calculating centroids, I have us
     
     As specified above, the dataset was collected among people in Turkey. This means that the names of the columns are in Turkish. I have added a small mechanism to tackle this (after trying to add a dynamic call to Google Translate API, with no success), simply by preparing a .csv translation file, and have the code read it and substitute the Turkish names with the English names.
 \end{enumerate}
+\section{Results}
+\subsection{PCA}
+I ran the PCA algorithm, as a classic method for reduction of dimensionality from the high dimension to 2 dimensions. Clustering, in this case was quite immediate, since the data is divided in two distinguished bulks, separated along the x-axis (the highest significant dimension), while each bulk keeps the structure of a tight formation, which is more in the shape of an ellipse, with the y-radius measuring longer than the x-radius. For the case of PCA, all the clustering methods that I used yield the same amount of clusters (2), which is the minimum, with relatively high silhouette scores. The advantage of using PCA for this dataset, even though it does not expose a rich structure of the data, is that it shows the general division of the data. Using the Diagnosis column as a pivot, we obtain a clear image of the separation between the two groups of people who are, or are not, diagnosed with Schizophrenia.
+
+\begin{figure}[htbp]
+    \centering
+    \subfigure[PCA KMeans]{
+        \includegraphics[width=0.3\textwidth]{PCA-KMeans.png}
+    }
+    \subfigure[PCA DBSCAN]{
+        \includegraphics[width=0.3\textwidth]{PCA-DBSCAN.png}
+    }
+    \subfigure[PCA GaussianMixture]{
+        \includegraphics[width=0.3\textwidth]{PCA-GaussianMixture.png}
+    }
+    \caption{PCA}
+\end{figure}
+
+
+
+
 
 \url{https://www.overleaf.com/contact}.
 

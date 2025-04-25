@@ -23,6 +23,8 @@ import shutil
 
 from statistics import mean as st_mean
 
+from scipy.stats import chi2_contingency
+
 p_value_threshold = 0.05
 
 
@@ -168,6 +170,14 @@ def calculate_statistics_on_clusters_by_target(df, entry, pivot_column, threshol
     num_clusters = entry['opt_k']
     reducer_display_name = entry['reducer_display_name']
     clustering_display_name = entry['clustering_display_name']
+
+    df['cluster'] = cluster_labels
+
+    table = pd.crosstab(df['cluster'], df[target_column])
+
+    chi2, p, dof, expected = chi2_contingency(table)
+
+    df = df.drop(columns=['cluster'])
 
     if num_clusters > 0 and pivot_column in df:
         arr = df.get(pivot_column).tolist()
