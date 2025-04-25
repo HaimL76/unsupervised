@@ -223,8 +223,20 @@ def calculate_statistics_on_clusters_by_target(df, entry, pivot_column, threshol
                     cluster = dict_clusters[label]
 
                     cluster.append(arr[j])
-
             _ = 0
+
+            list0: list = list(dict_clusters.values())
+
+            f_stat = None
+            p_anova = None
+
+            if len(list0) > 1:
+                f_stat, p_anova = f_oneway(*list0)
+
+            list_stats.append((reducer_display_name, clustering_display_name, target_column, f_stat, p_anova))
+
+            if p_anova < 0.05:
+                _ = 0
         _ = 0
 
     return list_stats, list_stats_test
