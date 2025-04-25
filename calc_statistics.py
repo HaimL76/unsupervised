@@ -28,7 +28,8 @@ p_value_threshold = 0.05
 
 def calculate_statistics_for_clusters(df, entry, list_stats: list, list_stats_test: list,
                                       path_components: list = ['classification'],
-                                      pivot_column: str = None, threshold: float = None):
+                                      pivot_column: str = None, threshold: float = None,
+                                      target_column: str = None):
     cluster_labels = entry['opt_labels']
     num_clusters = entry['opt_k']
     reducer_display_name = entry['reducer_display_name']
@@ -106,7 +107,8 @@ def calculate_statistics_for_clusters(df, entry, list_stats: list, list_stats_te
                                                                                          pivot_column=pivot_column,
                                                                                          threshold=threshold,
                                                                                          list_stats=arr_list_stats,
-                                                                                         list_stats_test=arr_list_stats_test)
+                                                                                         list_stats_test=arr_list_stats_test,
+                                                                                         target_column='Suicide_Attempt')
 
     return list_stats, list_stats_test
 
@@ -160,7 +162,8 @@ def calculate_statistics_on_all_clusters(df, entry,
 
 def calculate_statistics_on_clusters_by_target(df, entry, pivot_column, threshold,
                                                list_stats: list = [],
-                                               list_stats_test: list = []):
+                                               list_stats_test: list = [],
+                                               target_column: str = None):
     cluster_labels = entry['opt_labels']
     num_clusters = entry['opt_k']
     reducer_display_name = entry['reducer_display_name']
@@ -178,21 +181,50 @@ def calculate_statistics_on_clusters_by_target(df, entry, pivot_column, threshol
                 cluster = list_clusters[label]
                 cluster.append(arr[i])
 
+        list_by_pivot = None
+
         for i in range(len(list_clusters)):
             cluster = list_clusters[i]
 
             mn = st_mean(cluster)
 
-            if not isinstance(list_stats, list) or len(list_stats) < 2:
-                list_stats = [[], []]
+            if not isinstance(list_by_pivot, list) or len(list_by_pivot) < 2:
+                list_by_pivot = [[], []]
 
             index = 0
 
             if mn > threshold:
                 index = 1
 
-            list_stats[index].append(i)
+            list_by_pivot[index].append(i)
 
+        arr = df.get(target_column).tolist()
+
+        list_of_clusters = None
+
+        for i in range(2):
+            list_cluster_indices = list_by_pivot[i]
+
+            if not isinstance(list_of_clusters, list) or len(list_of_clusters) < 2:
+                list_of_clusters = [[], []]
+
+            dict_clusters = list_of_clusters[i]
+
+            if not isinstance(dict_clusters, dict):
+                list_of_clusters[i] = dict_clusters = {}
+
+            for j in range(len(arr)):
+                label = cluster_labels[j]
+
+                if label in list_cluster_indices:
+                    if label not in dict_clusters:
+                        dict_clusters[label] = []
+
+                    cluster = dict_clusters[label]
+
+                    cluster.append(arr[i])
+
+            _ = 0
         _ = 0
 
     return list_stats, list_stats_test
