@@ -51,7 +51,8 @@ clustering_options = [
 
 def calculate_clusters(df_original, points: np.ndarray, clustering, k_min: int = 3, k_max: int = 3,
                        reducer_display_name: str = '', opt_cluster_scores: list = [],
-                       list_stats: list = [], list_stats_test: list = []):
+                       list_stats: list = [], list_stats_test: list = [],
+                       target_column: str = None):
     clustering_method = clustering[str_method]
     clustering_params = clustering[str_params]
     clustering_display_name = clustering[str_display_name]
@@ -135,7 +136,8 @@ def calculate_clusters(df_original, points: np.ndarray, clustering, k_min: int =
 
         list_stats, list_stats_test = calculate_statistics_for_clusters(df_original, opt_cluster_score,
                                                                         list_stats, list_stats_test,
-                                                                        path_components=path_components)
+                                                                        path_components=path_components,
+                                                                        target_column=target_column, threshold=0.5)
 
     list_clusters = []
 
@@ -149,7 +151,7 @@ def calculate_clusters(df_original, points: np.ndarray, clustering, k_min: int =
             clusters.remove(-1)
 
         if len(clusters) > 0:
-            list_clusters = [None] * len(clusters)
+            list_clusters = [[] for i in range(len(clusters))]
 
             for index in range(len(points)):
                 coords = points[index]

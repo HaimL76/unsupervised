@@ -21,6 +21,8 @@ import matplotlib.patheffects as path_effects
 
 import shutil
 
+from statistics import mean as st_mean
+
 p_value_threshold = 0.05
 
 
@@ -93,12 +95,18 @@ def calculate_statistics_for_clusters(df, entry, list_stats: list, list_stats_te
         plt.tight_layout()
         plt.savefig(class_image_file, dpi=300)
 
-        if target_column is not None:
-            arr = df.get(col).tolist()
-
         list_stats, list_stats_test = calculate_statistics_on_all_clusters(df, entry,
                                                                            list_stats=list_stats,
                                                                            list_stats_test=list_stats_test)
+
+        arr_list_stats = []
+        arr_list_stats_test = []
+
+        arr_list_stats, arr_list_stats_test = calculate_statistics_on_clusters_by_target(df, entry,
+                                                                                         target_column=target_column,
+                                                                                         threshold=threshold,
+                                                                                         list_stats=arr_list_stats,
+                                                                                         list_stats_test=arr_list_stats_test)
 
     return list_stats, list_stats_test
 
@@ -146,5 +154,43 @@ def calculate_statistics_on_all_clusters(df, entry,
 
             list_stats.append(
                 (reducer_display_name, clustering_display_name, col, f_stat, p_anova, h_stat, p_kruskal))
+
+    return list_stats, list_stats_test
+
+
+def calculate_statistics_on_clusters_by_target(df, entry, target_column, threshold,
+                                               list_stats: list = [],
+                                               list_stats_test: list = []):
+    cluster_labels = entry['opt_labels']
+    num_clusters = entry['opt_k']
+    reducer_display_name = entry['reducer_display_name']
+    clustering_display_name = entry['clustering_display_name']
+
+    if num_clusters > 0 and target_column in df:
+        arr = df.get(target_column).tolist()
+
+        list_clusters = [[] for i in range(num_clusters)]
+
+        for i in range(len(arr)):
+            label = cluster_labels[i]
+
+            if label < len(list_clusters):
+                cluster = list_clusters[label]
+                cluster.append(arr[i])
+
+        for i in range(len(list_clusters)):
+            cluster = list_clusters[i]
+
+            mn = st_mean(cluster)
+
+            if not isinstance(list_stats, list) or len(list_stats) < 2:
+                list_stats = [[], []]
+
+            index = 0
+
+            if mn > threshold:
+                index = 1
+
+            list_stats[index].append(i)
 
     return list_stats, list_stats_test

@@ -119,7 +119,8 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
         path_components = ['classification', 'highest-score-cluster']
 
         _, _ = calculate_statistics_for_clusters(df_original, most_optimal_cluster, [], [],
-                                                 path_components=path_components)
+                                                 path_components=path_components,
+                                                 target_column=target_column, threshold=0.5)
 
     clusters_file_path = os.path.join('output', 'clusters.txt')
 
@@ -199,7 +200,8 @@ def calculate_dimension_reduction(
             df_original, arr, clustering, k_min=k_min, k_max=k_max,
             reducer_display_name=reducer_display_name,
             opt_cluster_scores=opt_cluster_scores,
-            list_stats=list_stats, list_stats_test=list_stats_test)
+            list_stats=list_stats, list_stats_test=list_stats_test,
+        target_column=target_column)
 
         if isinstance(opt_cluster_scores, list) and len(opt_cluster_scores) > 0:
             new_opt_score = opt_cluster_scores[-1]
