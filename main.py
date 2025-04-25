@@ -24,7 +24,7 @@ def main():
     columns_to_drop: list = None
     k_min = 2
     k_max = 22
-    target_column: str = None
+    pivot_column: str = None
 
     len_file_tuple = len(file_tuple)
 
@@ -45,13 +45,13 @@ def main():
             k_max = k_tup[1]
 
     if len_file_tuple > 4:
-        target_column = file_tuple[4]
+        pivot_column = file_tuple[4]
 
     if file_path:
         if file_separator is None:
             file_separator = ','
 
-        calculate(file_path, target_column=target_column, drop_target_column=False,
+        calculate(file_path, pivot_column=pivot_column, drop_pivot_column=False,
                   columns_to_drop=columns_to_drop, csv_sep=file_separator,
                   k_min=k_min, k_max=k_max)
 

@@ -41,7 +41,7 @@ dimension_reduction_methods = [
 ]
 
 
-def calculate(csv_file, target_column=None, drop_target_column: bool = True, columns_to_drop: list = None,
+def calculate(csv_file, pivot_column=None, drop_pivot_column: bool = True, columns_to_drop: list = None,
               csv_sep=',', k_min=2, k_max=22):
     if os.path.exists('output'):
         shutil.rmtree('output')
@@ -69,12 +69,12 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
         col = df_original[col_name]
         df_original[col_name] = encoder.fit_transform(col)
 
-    # If target_column is provided, extract labels
-    if target_column and target_column in df_original.columns:
-        labels = df_original[target_column]
+    # If pivot_column is provided, extract labels
+    if pivot_column and pivot_column in df_original.columns:
+        labels = df_original[pivot_column]
 
-        if drop_target_column:
-            df = df_original.drop(columns=[target_column])
+        if drop_pivot_column:
+            df = df_original.drop(columns=[pivot_column])
     else:
         labels = None
 
@@ -111,7 +111,7 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
 
     for reducer_index in range(len_dimension_reduction_methods):
         opt_cluster_scores, most_optimal_cluster = calculate_dimension_reduction(
-            df_original, df_scaled, reducer_index, labels, target_column,
+            df_original, df_scaled, reducer_index, labels, pivot_column,
             opt_cluster_scores=opt_cluster_scores, most_optimal_cluster=most_optimal_cluster,
             k_min=k_min, k_max=k_max, list_stats=list_stats, list_stats_test=list_stats_test)
 
@@ -120,7 +120,7 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
 
         _, _ = calculate_statistics_for_clusters(df_original, most_optimal_cluster, [], [],
                                                  path_components=path_components,
-                                                 target_column=target_column, threshold=0.5)
+                                                 pivot_column=pivot_column, threshold=0.5)
 
     clusters_file_path = os.path.join('output', 'clusters.txt')
 
@@ -165,7 +165,7 @@ def calculate(csv_file, target_column=None, drop_target_column: bool = True, col
 
 
 def calculate_dimension_reduction(
-        df_original, df_scaled, reducer_index, labels, target_column=None,
+        df_original, df_scaled, reducer_index, labels, pivot_column=None,
         opt_cluster_scores: list = [], most_optimal_cluster=None,
         k_min=2, k_max=22, list_stats: list = [], list_stats_test: list = []):
     num_comps = 2
@@ -201,7 +201,7 @@ def calculate_dimension_reduction(
             reducer_display_name=reducer_display_name,
             opt_cluster_scores=opt_cluster_scores,
             list_stats=list_stats, list_stats_test=list_stats_test,
-        target_column=target_column)
+        pivot_column=pivot_column)
 
         if isinstance(opt_cluster_scores, list) and len(opt_cluster_scores) > 0:
             new_opt_score = opt_cluster_scores[-1]

@@ -28,7 +28,7 @@ p_value_threshold = 0.05
 
 def calculate_statistics_for_clusters(df, entry, list_stats: list, list_stats_test: list,
                                       path_components: list = ['classification'],
-                                      target_column: str = None, threshold: float = None):
+                                      pivot_column: str = None, threshold: float = None):
     cluster_labels = entry['opt_labels']
     num_clusters = entry['opt_k']
     reducer_display_name = entry['reducer_display_name']
@@ -103,7 +103,7 @@ def calculate_statistics_for_clusters(df, entry, list_stats: list, list_stats_te
         arr_list_stats_test = []
 
         arr_list_stats, arr_list_stats_test = calculate_statistics_on_clusters_by_target(df, entry,
-                                                                                         target_column=target_column,
+                                                                                         pivot_column=pivot_column,
                                                                                          threshold=threshold,
                                                                                          list_stats=arr_list_stats,
                                                                                          list_stats_test=arr_list_stats_test)
@@ -158,7 +158,7 @@ def calculate_statistics_on_all_clusters(df, entry,
     return list_stats, list_stats_test
 
 
-def calculate_statistics_on_clusters_by_target(df, entry, target_column, threshold,
+def calculate_statistics_on_clusters_by_target(df, entry, pivot_column, threshold,
                                                list_stats: list = [],
                                                list_stats_test: list = []):
     cluster_labels = entry['opt_labels']
@@ -166,8 +166,8 @@ def calculate_statistics_on_clusters_by_target(df, entry, target_column, thresho
     reducer_display_name = entry['reducer_display_name']
     clustering_display_name = entry['clustering_display_name']
 
-    if num_clusters > 0 and target_column in df:
-        arr = df.get(target_column).tolist()
+    if num_clusters > 0 and pivot_column in df:
+        arr = df.get(pivot_column).tolist()
 
         list_clusters = [[] for i in range(num_clusters)]
 
@@ -192,5 +192,7 @@ def calculate_statistics_on_clusters_by_target(df, entry, target_column, thresho
                 index = 1
 
             list_stats[index].append(i)
+
+        _ = 0
 
     return list_stats, list_stats_test
