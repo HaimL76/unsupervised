@@ -25,7 +25,8 @@ p_value_threshold = 0.05
 
 
 def calculate_statistics_for_clusters(df, entry, list_stats: list, list_stats_test: list,
-                                      path_components: list = ['classification']):
+                                      path_components: list = ['classification'],
+                                      target_column: str = None, threshold: float = None):
     cluster_labels = entry['opt_labels']
     num_clusters = entry['opt_k']
     reducer_display_name = entry['reducer_display_name']
@@ -62,7 +63,7 @@ def calculate_statistics_for_clusters(df, entry, list_stats: list, list_stats_te
         plt.title("Cluster Feature Means")
         plt.savefig(class_file_heat, dpi=300)
 
-        df.drop(columns=['cluster'])
+        df = df.drop(columns=['cluster'])
 
         file_name_csv = f'{file_name}.txt'
 
@@ -92,6 +93,25 @@ def calculate_statistics_for_clusters(df, entry, list_stats: list, list_stats_te
         plt.tight_layout()
         plt.savefig(class_image_file, dpi=300)
 
+        if target_column is not None:
+            arr = df.get(col).tolist()
+
+        list_stats, list_stats_test = calculate_statistics_on_all_clusters(df, entry,
+                                                                           list_stats=list_stats,
+                                                                           list_stats_test=list_stats_test)
+
+    return list_stats, list_stats_test
+
+
+def calculate_statistics_on_all_clusters(df, entry,
+                                         list_stats: list = [],
+                                         list_stats_test: list = []):
+    cluster_labels = entry['opt_labels']
+    num_clusters = entry['opt_k']
+    reducer_display_name = entry['reducer_display_name']
+    clustering_display_name = entry['clustering_display_name']
+
+    if num_clusters > 0:
         for col in df.columns:
             arr = df.get(col).tolist()
 
