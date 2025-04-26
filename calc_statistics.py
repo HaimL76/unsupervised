@@ -12,7 +12,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from utils import replace_extension, csv_to_dict, k_means
 
-from scipy.stats import f_oneway, kruskal
+from scipy.stats import f_oneway, kruskal, chi2_contingency
 import scikit_posthocs as sp
 
 import seaborn as sns
@@ -24,6 +24,8 @@ import shutil
 from statistics import mean as st_mean
 
 from scipy.stats import chi2_contingency
+
+from test_chi2 import run_chi2
 
 p_value_threshold = 0.05
 
@@ -288,6 +290,11 @@ def calculate_statistics_on_clusters_by_target(df, entry, pivot_column, pivot_va
                                 cluster = dict_clusters[label]
 
                                 cluster.append(arr[i])
+
+                        list0: list = list(dict_clusters.values())
+
+                        if len(list0) > 1:
+                            chi2, p, dof, expected = run_chi2(list0)
                     _ = 0
                 _ = 0
             _ = 0
