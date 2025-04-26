@@ -107,6 +107,7 @@ def calculate_statistics_for_clusters(df, entry, list_stats: list, list_stats_te
 
         arr_list_stats, arr_list_stats_test = calculate_statistics_on_clusters_by_target(df, entry,
                                                                                          pivot_column=pivot_column,
+                                                                                         pivot_value=1,
                                                                                          threshold=threshold,
                                                                                          list_stats=arr_list_stats,
                                                                                          list_stats_test=arr_list_stats_test,
@@ -162,7 +163,7 @@ def calculate_statistics_on_all_clusters(df, entry,
     return list_stats, list_stats_test
 
 
-def calculate_statistics_on_clusters_by_target(df, entry, pivot_column, threshold,
+def calculate_statistics_on_clusters_by_target(df, entry, pivot_column, pivot_value, threshold,
                                                list_stats: list = [],
                                                list_stats_test: list = [],
                                                target_column: str = None):
@@ -193,6 +194,8 @@ def calculate_statistics_on_clusters_by_target(df, entry, pivot_column, threshol
 
         list_by_pivot = None
 
+        clusters_of_interest: list = None
+
         for i in range(len(list_clusters)):
             cluster = list_clusters[i]
 
@@ -212,27 +215,28 @@ def calculate_statistics_on_clusters_by_target(df, entry, pivot_column, threshol
 
         list_of_clusters = None
 
-        for i in range(2):
-            list_cluster_indices = list_by_pivot[i]
+        list_cluster_indices: list = None
 
-            if not isinstance(list_of_clusters, list) or len(list_of_clusters) < 2:
-                list_of_clusters = [[], []]
+        for i in range(len(list_by_pivot)):
+            if i == pivot_value:
+                list_cluster_indices = list_by_pivot[i]
 
-            dict_clusters = list_of_clusters[i]
+        if len(list_cluster_indices) > 1:
+            dict_clusters: dist = None
 
-            if not isinstance(dict_clusters, dict):
-                list_of_clusters[i] = dict_clusters = {}
-
-            for j in range(len(arr)):
-                label = cluster_labels[j]
+            for i in range(len(arr)):
+                label = cluster_labels[i]
 
                 if label in list_cluster_indices:
+                    if dict_clusters is None:
+                        dict_clusters = {}
+
                     if label not in dict_clusters:
                         dict_clusters[label] = []
 
                     cluster = dict_clusters[label]
 
-                    cluster.append(arr[j])
+                    cluster.append(arr[i])
             _ = 0
 
             list0: list = list(dict_clusters.values())
@@ -259,5 +263,7 @@ def calculate_statistics_on_clusters_by_target(df, entry, pivot_column, threshol
                     if p_anova is not None and p_anova < 0.05:
                         _ = 0
                         _ = 0
+
+
 
     return list_stats, list_stats_test
