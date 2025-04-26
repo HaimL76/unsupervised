@@ -113,7 +113,10 @@ def calculate_statistics_for_clusters(df, entry, list_stats: list, list_stats_te
                                                                                          threshold=threshold,
                                                                                          list_stats=arr_list_stats,
                                                                                          list_stats_test=arr_list_stats_test,
-                                                                                         target_column='Suicide_Attempt')
+                                                                                         target_column='Suicide_Attempt',
+                                                                                         path_components=[
+                                                                                             'classification',
+                                                                                             'highest-score-cluster'])
 
     return list_stats, list_stats_test
 
@@ -168,7 +171,8 @@ def calculate_statistics_on_all_clusters(df, entry,
 def calculate_statistics_on_clusters_by_target(df, entry, pivot_column, pivot_value, threshold,
                                                list_stats: list = [],
                                                list_stats_test: list = [],
-                                               target_column: str = None):
+                                               target_column: str = None,
+                                               path_components: list = None):
     cluster_labels = entry['opt_labels']
     num_clusters = entry['opt_k']
     reducer_display_name = entry['reducer_display_name']
@@ -264,6 +268,8 @@ def calculate_statistics_on_clusters_by_target(df, entry, pivot_column, pivot_va
                         _ = 0
                         _ = 0
 
+            list_chi2: list = None
+
             list_of_columns: list = ['Age', 'Gender']
 
             len_columns: int = len(list_of_columns)
@@ -295,14 +301,51 @@ def calculate_statistics_on_clusters_by_target(df, entry, pivot_column, pivot_va
 
                         if len(list0) > 1:
                             chi2, p, dof, expected = run_chi2(list0)
-                    _ = 0
-                _ = 0
-            _ = 0
 
-            list0: list = list(dict_clusters.values())
+                            if list_chi2 is None:
+                                list_chi2 = []
 
+                            list_chi2.append({
+                                'column': col,
+                                'chi2': chi2,
+                                'p': p,
+                                'dof': dof,
+                                'expected': expected
+                            })
 
+            len_chi2: int = len(list_chi2)
 
+            if len_chi2 > 0:
+                class_folder = 'output'
 
+                for component in path_components:
+                    if component is not None:
+                        class_folder = os.path.join(class_folder, component)
+
+                        if not os.path.exists(class_folder):
+                            os.makedirs(class_folder)
+
+                file_name = f'{reducer_display_name}-{clustering_display_name}'
+
+                file_name_chi2 = f'{file_name}-chi2.txt'
+
+                class_file_chi2 = os.path.join(class_folder, file_name_chi2)
+
+                with open(class_file_chi2, 'w') as fwriter:
+                    fwriter.write('column,chi2,p,dof\n')
+
+                    for i in range(len_chi2):
+                        chi2_obj = list_chi2[i]
+
+                        if isinstance(chi2_obj, dict) and len(chi2_obj) > 0:
+                            column = chi2_obj['column'],
+                            chi2 = chi2_obj['chi2'],
+                            p = chi2_obj['p'],
+                            dof = chi2_obj['dof'],
+                            expected = chi2_obj['expected']
+
+                            str = f'{column},{chi2},{p},{dof}\n'
+
+                            fwriter.write(str)
 
     return list_stats, list_stats_test
