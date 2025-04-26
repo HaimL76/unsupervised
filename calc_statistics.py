@@ -213,8 +213,6 @@ def calculate_statistics_on_clusters_by_target(df, entry, pivot_column, pivot_va
 
         arr = df.get(target_column).tolist()
 
-        list_of_clusters = None
-
         list_cluster_indices: list = None
 
         for i in range(len(list_by_pivot)):
@@ -263,6 +261,40 @@ def calculate_statistics_on_clusters_by_target(df, entry, pivot_column, pivot_va
                     if p_anova is not None and p_anova < 0.05:
                         _ = 0
                         _ = 0
+
+            list_of_columns: list = ['Age', 'Gender']
+
+            len_columns: int = len(list_of_columns)
+
+            if len_columns > 0:
+                for col in list_of_columns:
+                    dict_clusters: dict = None
+
+                    arr = df.get(col).tolist()
+
+                    len_arr: int = len(arr)
+
+                    if len_arr > 0:
+                        for i in range(len_arr):
+                            label = cluster_labels[i]
+
+                            if label in list_cluster_indices:
+                                if dict_clusters is None:
+                                    dict_clusters = {}
+
+                                if label not in dict_clusters:
+                                    dict_clusters[label] = []
+
+                                cluster = dict_clusters[label]
+
+                                cluster.append(arr[i])
+                    _ = 0
+                _ = 0
+            _ = 0
+
+            list0: list = list(dict_clusters.values())
+
+
 
 
 
