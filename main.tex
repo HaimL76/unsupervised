@@ -166,14 +166,14 @@ For an easier analysis of the data, we can display the best results in a heatmap
 We can clearly observe from the heatmap that the subject-oriented columns (Diagnosis and the three behavioral scores) form a strong distinction between the two populations, the diagnosed people, and the people who are not diagnosed. This can lead us to working on different questions. What got my eye was the difference between the two clusters of diagnosed people, namely 1 and 4 (since the scores for all the clusters of the UMAP algorithm are the same, we randomly pick the K-Means clustering, so we can see the indexed clusters in the UMAP K-Means image above).
 As it appears, the only significant difference between these two clusters is in the suicide attempt column, which says, if we can prove it statistically, that \textbf{other features, existing in this dataset, do not influence the suicidal tendency of the diagnosed person}, which can lead to the harsh conclusion, that Schizophrenic people may attempt to commit suicide, or avoid this, regardless of other parameters, such as the group in population they belong to (male/female, young/old etc.), or their environmental and genetic factors (family history, stress factors, social support etc.), thus being a substantial challenge for the mental health teams taking care of them. 
 Using the $\chi^2$ for categorical variables (which are the majority of the variables in this dataset) and t-test for variables such as gender, durasion of disease etc., we do establish the above observation through statistical tests, as shown in the following table.
-\begin{table}[ht]
+\begin{table}[h]
 \centering
 \begin{tabular}{|l|c|}
 \hline
-\textbf{Column} & \textbf{p-value} \\
+\textbf{Variable} & \textbf{p-value} \\
 \hline
 Age & 0.3404 \\
-Gender & 0.6779 \\
+Gender & 0.6780 \\
 Education Level & 0.1944 \\
 Marital Status & 0.3908 \\
 Occupation & 0.1858 \\
@@ -187,7 +187,8 @@ Number of Hospitalizations & 0.6519 \\
 Disease Duration & 0.0761 \\
 \hline
 \end{tabular}
-\caption{Table of Columns and p-values}
+\caption{p-values for each variable comparing between clusters.}
+\label{tab:p_values}
 \end{table}
 Taking $0.05$ as the magic value for $p$ in statistical tests, we can see that none of our columns $p$-values has managed to pass the test, that is to say, if $H_0$ is that $\mu_0[\text{column}]=\mu_1[\text{column}]$, where $\mu_0[\text{column}]$ is the mean of the particular column among patients who did not make an attempt to commit suicide, and $\mu_1[\text{column}]$ is the mean among patients who did make an attempt, and $H_a$ is that $\mu_0[\text{column}]\neq\mu_1[\text{column}]$, then it is safe to say that $H_0$ holds for all cases. However, it would be wise to pay attention to relatively small values, particularly values that are rather close to $0.05$, such as the Disease Duration column.
 
