@@ -55,24 +55,28 @@ I used three methods for clustering.
     \item Gaussian Mixture
 \end{enumerate}
 
-For methods that are given the expected number of clusters, I have iterated over a range of possible numbers, calculating the silhouette score on each iteration, and updating a stored value of the maximum score. While the minimum number of clusters is naturally 2, the maximum number is a matter of guessing TODO.
+For methods that are given the expected number of clusters, I have iterated over a range of possible numbers, calculating the silhouette score on each iteration, and updating a stored value of the maximum score. While the minimum number of clusters is naturally 2, the maximum number is a matter of guessing.
 
 For the DBSCAN algorithm, which is not based on calculating centroids, I have used the same parameter for calculating the epsilon parameter, by a heuristic function which divides the total area of the set of data points by this increasing factor, yielding a decreasing set of distances, which are used as the epsilon input parameter.
 
 \subsection{Statistical Tests}
-For the categorical variables I used the $\chi^2$ test, while for the quantitative variables I used the one-way ANOVA test, as shall be explained in the results part. 
+For the categorical variables I used the $\chi^2$ test, while for the quantitative variables I used t-test, as shall be explained in the results part. 
 \subsection{Remarks}
 \begin{enumerate}
     \item Columns to Drop
 
     Many datasets, including the dataset I was working with, have columns that do not carry any real measurable data, specifically the numeric identifier of the data points, usually it will be the first column. Such columns are not only irrelevant for our analysis, they also add noise, and in order to avoid using them in the process of learning, I added an optional input parameter to the process, telling it to drop specific columns.
-    \item Target Columns
+    \item Pivot Columns
 
     As mentioned earlier, our dataset contains features that are directly related to the subject of our study, meaning the diagnosis and the behavioral tests that support it. Thus, it would be useful to identify a target column, in our case the diagnosis, and use it as the pivot of our research, since we want to find ties (or strict differences) between the features that are common among people who are diagnosed as Schizophrenic. For this purpose, I also added an optional input parameter. As a side effect of this, there is the next remark.
 
     \item Cluster Visualization
 
     Looking at different examples, there seems to be a tendency to visualize the different clusters using different colors. However, I found that it would be useful for my analysis to visualize the index (cluster label) of each cluster, next to the middle point of the cluster, while using different colors to visualize the value of the target column, as mentioned in the previous remark.
+
+    \item Statistical Tests
+
+    In this paper, and the accompanying code, I use the t-test for quantitative variables, since my choice of optimal clustering goes with the method that yields only two distinguished clusters for the Schizophrenia-diagnosed population. However, while preparing this paper and code I made some statistical tests on a higher number of clusters, using the One-way ANOVA test, and therefore the code basically supports both tests (simply by checking if the number of clusters is 2 or more).
 
     \item Language Barrier
     
@@ -160,7 +164,7 @@ For an easier analysis of the data, we can display the best results in a heatmap
 
 We can clearly observe from the heatmap that the subject-oriented columns (Diagnosis and the three behavioral scores) form a strong distinction between the two populations, the diagnosed people, and the people who are not diagnosed. This can lead us to working on different questions. What got my eye was the difference between the two clusters of diagnosed people, namely 1 and 4 (since the scores for all the clusters of the UMAP algorithm are the same, we randomly pick the K-Means clustering, so we can see the indexed clusters in the UMAP K-Means image above).
 As it appears, the only significant difference between these two clusters is in the suicide attempt column, which says, if we can prove it statistically, that \textbf{other features, existing in this dataset, do not influence the suicidal tendency of the diagnosed person}, which can lead to the harsh conclusion, that Schizophrenic people may attempt to commit suicide, or avoid this, regardless of other parameters, such as the group in population they belong to (male/female, young/old etc.), or their environmental and genetic factors (family history, stress factors, social support etc.), thus being a substantial challenge for the mental health teams taking care of them. 
-Using the $\chi^2$ for categorical variables (which are the majority of the variables in this dataset) and one-way ANOVA for variables such as gender, durasion of disease etc., we do establish the above observation through statistical tests, as shown in the following table.
+Using the $\chi^2$ for categorical variables (which are the majority of the variables in this dataset) and t-test for variables such as gender, durasion of disease etc., we do establish the above observation through statistical tests, as shown in the following table.
 \begin{table}[ht]
 \centering
 \begin{tabular}{|l|c|}
@@ -204,9 +208,19 @@ I have shown that the suicidal tendency among the Schizophrenia-diagnosed people
 
 There are many other factors that can influence this condition, and all should be studied, for the benefit of the population, but I only stated a few of them which I find particularly influencing.
 
-\url{https://www.overleaf.com/contact}.
+\section{Links}
+git repository: \url{https://github.com/HaimL76/unsupervised.git}\newline
+overleaf project: \url{https://www.overleaf.com/read/dyrnjnxdkbkf#908474}\newline
+executable file: \url{https://drive.google.com/file/d/1J-hOjCndZ0Q3PCy5jHOU1jL5xxLNBAiU/view?usp=sharing}
 
-\bibliographystyle{alpha}
-\bibliography{sample}
-
+\begin{thebibliography}{2}
+\bibitem{PCA1}
+https://www.linkedin.com/pulse/principal-component-analysis-pca-made-easy-mario-la-rocca
+\bibitem{Silhouette1}
+https://www.analyticsvidhya.com/blog/2021/05/k-mean-getting-the-optimal-number-of-clusters/
+\bibitem{DBSCAN1}
+https://www.geeksforgeeks.org/dbscan-clustering-in-ml-density-based-clustering/
+\bibitem{GaussianMixture1}
+https://www.geeksforgeeks.org/gaussian-mixture-model/
+\end{thebibliography}
 \end{document}
