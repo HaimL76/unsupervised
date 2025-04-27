@@ -12,7 +12,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from utils import replace_extension, csv_to_dict, k_means
 
-from scipy.stats import f_oneway, kruskal, chi2_contingency
+from scipy.stats import f_oneway, kruskal, chi2_contingency, ttest_ind
 import scikit_posthocs as sp
 
 import seaborn as sns
@@ -311,7 +311,10 @@ def calculate_statistics_on_clusters_by_target(df, entry, pivot_column, pivot_va
                                             if len(tup) > 1 and tup[1] == 1:  # categorical
                                                 chi2, p, dof, expected = run_chi2(list0)
                                             else:
-                                                f_stat, p = f_oneway(*list0)
+                                                if len(list0) == 2:
+                                                    t_stat, p = ttest_ind(list0[0], list0[1])
+                                                else:
+                                                    f_stat, p = f_oneway(*list0)
 
                                             if list_stat_test0 is None:
                                                 list_stat_test0 = []
