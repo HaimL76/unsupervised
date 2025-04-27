@@ -109,7 +109,7 @@ def calculate(csv_file, pivot_column=None, target_column: str = None, drop_pivot
     list_stats: list = []
     list_stats_test: list = []
 
-    for reducer_index in range(2,3):
+    for reducer_index in range(len_dimension_reduction_methods):
         opt_cluster_scores, most_optimal_cluster = calculate_dimension_reduction(
             df_original, df_scaled, reducer_index, labels, pivot_column, target_column=target_column,
             opt_cluster_scores=opt_cluster_scores, most_optimal_cluster=most_optimal_cluster,

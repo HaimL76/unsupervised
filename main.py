@@ -9,7 +9,7 @@ list_of_columns: list = [('Age', 0), ('Gender', 1), ('Education_Level', 1), ('Ma
 
 def main():
     arr_files: list = [
-        (r'ds\schizophrenia_dataset.csv', ['Patient_ID'], ',', (8, 10), 'Diagnosis', 'Suicide_Attempt', list_of_columns)
+        (r'ds\schizophrenia_dataset.csv', ['Patient_ID'], ',', (2, 60), 'Diagnosis', 'Suicide_Attempt', list_of_columns)
     ]
 
     file_tuple: tuple = arr_files[-1]
