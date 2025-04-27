@@ -14,14 +14,14 @@
 \usepackage{float}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 
-\title{Your Paper}
-\author{You}
+\title{Suicidal Tendency Among Schizophrenia-Diagnosed Patients}
+\author{Haim Lavi, 038712105}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-Your abstract.
+In this paper, I shall analyze a dataset from Turkey, containing different features on people who are either diagnosed or not diagnosed as having Schizophrenia. Although there is much to study from this dataset about the disease itself, I shall concentrate in Schizophrenia-diagnosed people, and their tendency to attempt to commit suicide. I shall use unsupervised learning methods to find general patterns in the data, and by these patterns I will be able to identify this particular feature (suicide attempt), and I will try to check if it has any statistical relation to other features, or it stands by itself.
 \end{abstract}
 
 \section{Introduction}
@@ -185,6 +185,8 @@ Disease Duration & 0.0761 \\
 \caption{Table of Columns and p-values}
 \end{table}
 Taking $0.05$ as the magic value for $p$ in statistical tests, we can see that none of our columns $p$-values has managed to pass the test, that is to say, if $H_0$ is that $\mu_0[\text{column}]=\mu_1[\text{column}]$, where $\mu_0[\text{column}]$ is the mean of the particular column among patients who did not make an attempt to commit suicide, and $\mu_1[\text{column}]$ is the mean among patients who did make an attempt, and $H_a$ is that $\mu_0[\text{column}]\neq\mu_1[\text{column}]$, then it is safe to say that $H_0$ holds for all cases. However, it would be wise to pay attention to relatively small values, particularly values that are rather close to $0.05$, such as the Disease Duration column.
+
+\section{Discussion}
 
 
 \url{https://www.overleaf.com/contact}.
