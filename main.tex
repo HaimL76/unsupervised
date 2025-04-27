@@ -26,7 +26,7 @@ In this paper, I shall analyze a dataset from Turkey, containing different featu
 
 \section{Introduction}
 \subsection{General Explanation}
-Schizophrenia is a serious mental illness that affects the patient and disables him or her from performing as a fully capable valid person. The question of why someone has Schizophrenia does not always have a decisive answer, because there are many factors that can cause this situation, genetic and environmental. Research in this field can help find helpful ways to tackle this harsh situation, because, if we find several factors which are statistically observed as common among people who have Schizophrenia, especially if we find the most common ones, then neutralizing some of these factors can help in preventing the abruption of this mental condition. Another major question, which we shall also concentrate in, is, when we have a patient diagnosed with Schizophrenia, what must we consider regarding his or her own personal safety and well-being.
+Schizophrenia is a serious mental illness that affects the patient and disables him or her from performing as a fully capable valid person. The question of why someone has Schizophrenia does not always have a decisive answer, because there are many factors that can cause this situation, genetic and environmental. Research in this field can help find helpful ways to tackle this harsh situation, because, if we find several factors which are statistically observed as common among people who have Schizophrenia, especially if we find the most common ones, then neutralizing some of these factors can help in preventing the abruption of this mental condition. Another major question, which I shall concentrate in, is, when we have a patient diagnosed with Schizophrenia, what must we consider regarding his or her own personal safety and well-being, and specifically the danger of the patient taking his or her own life, and preventing it.
 \subsection{This Paper Research}
 I have found in Kaggle a dataset containing data collected among people in Turkey. The dataset contains several data features that I would like to divide to three categories:
 \begin{enumerate}
@@ -34,9 +34,10 @@ I have found in Kaggle a dataset containing data collected among people in Turke
     \item Features that directly correspond to the subject of Schizophrenia, above all is the diagnosis itself (diagnosed / not diagnosed as Schizophrenic), as well as mental and behavioral tests.
     \item Physical / Behavioral / Environmental features, that are suspected or known as factors for Schizophrenia, whether their influence is positive (having more of) or negative (having less of).
 \end{enumerate}
+By finding patterns and ties between these features, we may extract important information regarding Schizophrenia, its origins and ways of treatment, and also awaken new and interesting questions, such as the one I hereby present.
 \subsection{Main Question}
 One major question, regarding people diagnosed as Schizophrenic, is whether they are suicidal or not. The danger of having a person committing suicide can dictate the use of extreme safety measures, such as using heavy drugs or straitjackets. But if we can identify features that distinguish between different people who have Schizophrenia, we can avoid using those measures, and keep them only for people who share features that are highly related to being suicidal. 
-For instance, since committing suicide is an act of self-violence, we would expect this to be less common in females than in males, or we would expect this more in younger people rather than the matured age. Also, we can expect this to be more common in people who are addicted to drugs, which usually increase the violent tendencies of the person consuming them.
+For instance, since committing suicide is an act of self-violence, we would expect this to be less common in females than in males, or we would expect this more in younger people rather than the matured population. Also, we can expect this to be more common in people who are addicted to drugs, which usually increase the violent tendencies of the person consuming them.
 This question arose directly from the unsupervised data analysis, as shall be explained later.
 \section{Methods}
 \subsection{Dimensionality Reduction}
@@ -60,7 +61,7 @@ For methods that are given the expected number of clusters, I have iterated over
 For the DBSCAN algorithm, which is not based on calculating centroids, I have used the same parameter for calculating the epsilon parameter, by a heuristic function which divides the total area of the set of data points by this increasing factor, yielding a decreasing set of distances, which are used as the epsilon input parameter.
 
 \subsection{Statistical Tests}
-For the categorical variables I used the $\chi^2$ test, while for the quantitative variables I used t-test, as shall be explained in the results part. 
+For the categorical variables I used the $\chi^2$ test, while for the quantitative variables I used t-test, as shall be explained in the results part and the following remarks. 
 \subsection{Remarks}
 \begin{enumerate}
     \item Columns to Drop
@@ -68,15 +69,15 @@ For the categorical variables I used the $\chi^2$ test, while for the quantitati
     Many datasets, including the dataset I was working with, have columns that do not carry any real measurable data, specifically the numeric identifier of the data points, usually it will be the first column. Such columns are not only irrelevant for our analysis, they also add noise, and in order to avoid using them in the process of learning, I added an optional input parameter to the process, telling it to drop specific columns.
     \item Pivot Columns
 
-    As mentioned earlier, our dataset contains features that are directly related to the subject of our study, meaning the diagnosis and the behavioral tests that support it. Thus, it would be useful to identify a target column, in our case the diagnosis, and use it as the pivot of our research, since we want to find ties (or strict differences) between the features that are common among people who are diagnosed as Schizophrenic. For this purpose, I also added an optional input parameter. As a side effect of this, there is the next remark.
+    As mentioned earlier, our dataset contains features that are directly related to the subject of our study, meaning the diagnosis and the behavioral tests that support it. Thus, it would be useful to identify a particular column, in our case the diagnosis, and use it as the pivot of our research, since, for this particular question we are studying, we want to find ties (or strict differences) between the features that are common among people who are diagnosed as Schizophrenic. For this purpose, I also added an optional input parameter. As a side effect of this, there is the next remark.
 
     \item Cluster Visualization
 
-    Looking at different examples, there seems to be a tendency to visualize the different clusters using different colors. However, I found that it would be useful for my analysis to visualize the index (cluster label) of each cluster, next to the middle point of the cluster, while using different colors to visualize the value of the target column, as mentioned in the previous remark.
+    Looking at different examples, there seems to be a tendency to visualize the different clusters using different colors. However, I found that it would be useful for my analysis to visualize the index (cluster label) of each cluster, next to the middle point of the cluster, while using different colors to visualize the value of the pivot column, as mentioned in the previous remark.
 
     \item Statistical Tests
-
-    In this paper, and the accompanying code, I use the t-test for quantitative variables, since my choice of optimal clustering goes with the method that yields only two distinguished clusters for the Schizophrenia-diagnosed population. However, while preparing this paper and code I made some statistical tests on a higher number of clusters, using the One-way ANOVA test, and therefore the code basically supports both tests (simply by checking if the number of clusters is 2 or more).
+    
+    In this paper, and the accompanying code, I use the t-test for quantitative variables, since my choice of optimal clustering goes with the method that yields only two distinguished clusters for the population diagnosed with schizophrenia. However, while preparing this paper and code, I made some statistical tests on a higher number of clusters, using the One-way ANOVA test, and therefore the code basically supports both tests (simply by checking if the number of clusters is 2 or more).
 
     \item Language Barrier
     
