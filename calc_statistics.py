@@ -113,7 +113,7 @@ def calculate_statistics_for_clusters(df, entry, list_stats: list, list_stats_te
                                                                                          threshold=threshold,
                                                                                          list_stats=arr_list_stats,
                                                                                          list_stats_test=arr_list_stats_test,
-                                                                                         target_column='Suicide_Attempt',
+                                                                                         target_column=target_column,
                                                                                          path_components=[
                                                                                              'classification',
                                                                                              'highest-score-cluster'],

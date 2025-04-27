@@ -9,7 +9,7 @@ list_of_columns: list = [('Age', 0), ('Gender', 1), ('Education_Level', 1), ('Ma
 
 def main():
     arr_files: list = [
-        (r'ds\schizophrenia_dataset.csv', ['Patient_ID'], ',', (8, 10), 'Diagnosis', list_of_columns)
+        (r'ds\schizophrenia_dataset.csv', ['Patient_ID'], ',', (8, 10), 'Diagnosis', 'Suicide_Attempt', list_of_columns)
     ]
 
     file_tuple: tuple = arr_files[-1]
@@ -21,6 +21,7 @@ def main():
     k_max = 22
     pivot_column: str = None
     list_columns: list = None
+    target_column: str = None
 
     len_file_tuple = len(file_tuple)
 
@@ -44,13 +45,16 @@ def main():
         pivot_column = file_tuple[4]
 
     if len_file_tuple > 5:
-        list_columns = file_tuple[5]
+        target_column = file_tuple[5]
+
+    if len_file_tuple > 6:
+        list_columns = file_tuple[6]
 
     if file_path:
         if file_separator is None:
             file_separator = ','
 
-        calculate(file_path, pivot_column=pivot_column, drop_pivot_column=False,
+        calculate(file_path, pivot_column=pivot_column, target_column=target_column, drop_pivot_column=False,
                   columns_to_drop=columns_to_drop, csv_sep=file_separator,
                   k_min=k_min, k_max=k_max, list_of_columns=list_columns)
 

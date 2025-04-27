@@ -52,7 +52,8 @@ clustering_options = [
 def calculate_clusters(df_original, points: np.ndarray, clustering, k_min: int = 3, k_max: int = 3,
                        reducer_display_name: str = '', opt_cluster_scores: list = [],
                        list_stats: list = [], list_stats_test: list = [],
-                       pivot_column: str = None, list_of_columns: list = None):
+                       pivot_column: str = None, target_column: str = None,
+                       list_of_columns: list = None):
     clustering_method = clustering[str_method]
     clustering_params = clustering[str_params]
     clustering_display_name = clustering[str_display_name]
@@ -138,6 +139,7 @@ def calculate_clusters(df_original, points: np.ndarray, clustering, k_min: int =
                                                                         list_stats, list_stats_test,
                                                                         path_components=path_components,
                                                                         pivot_column=pivot_column, threshold=0.5,
+                                                                        target_column=target_column,
                                                                         list_of_columns=list_of_columns)
 
     list_clusters = []
