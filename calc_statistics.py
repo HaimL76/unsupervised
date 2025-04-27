@@ -256,96 +256,101 @@ def calculate_statistics_on_clusters_by_target(df, entry, pivot_column, pivot_va
                     if len_list1 > max_different_values:
                         max_different_values = len_list1
 
-                if max_different_values > 1:
-                    f_stat = None
-                    p_anova = None
+                can_check_columns: bool = False
 
-                    f_stat, p_anova = f_oneway(*list0)
+                if max_different_values == 1:
+                    can_check_columns = True
 
-                    list_stats.append((reducer_display_name, clustering_display_name, target_column, f_stat, p_anova))
+                if not can_check_columns:
+                    chi2, p, dof, expected = run_chi2(list0)
 
-                    if p_anova is not None and p_anova < 0.05:
-                        _ = 0
-                        _ = 0
+                    if p < 0.05:
+                        can_check_columns = True
 
-            list_chi2: list = None
+                if can_check_columns:
+                    list_stat_test0: list = None
 
-            list_of_columns: list = ['Age', 'Gender']
+                    list_of_columns: list = [('Age', 0), ('Gender', 1), ('Education_Level', 1), ('Marital_Status', 1),
+                                             ('Occupation', 1), ('Income_Level', 1), ('Place_of_Residence', 1),
+                                             ('Substance_Use', 1), ('Social_Support', 1), ('Stress_Factors', 1),
+                                             ('Family_History_of_Schizophrenia', 1), ('Number_of_Hospitalizations', 0),
+                                             ('Disease_Duration', 0)]
 
-            len_columns: int = len(list_of_columns)
+                    len_columns: int = len(list_of_columns)
 
-            if len_columns > 0:
-                for col in list_of_columns:
-                    dict_clusters: dict = None
+                    if len_columns > 0:
+                        for tup in list_of_columns:
+                            if isinstance(tup, tuple) and len(tup) > 0:
+                                col = tup[0]
 
-                    arr = df.get(col).tolist()
+                                if col:
+                                    dict_clusters: dict = None
 
-                    len_arr: int = len(arr)
+                                    arr = df.get(col).tolist()
 
-                    if len_arr > 0:
-                        for i in range(len_arr):
-                            label = cluster_labels[i]
+                                    len_arr: int = len(arr)
 
-                            if label in list_cluster_indices:
-                                if dict_clusters is None:
-                                    dict_clusters = {}
+                                    if len_arr > 0:
+                                        for i in range(len_arr):
+                                            label = cluster_labels[i]
 
-                                if label not in dict_clusters:
-                                    dict_clusters[label] = []
+                                            if label in list_cluster_indices:
+                                                if dict_clusters is None:
+                                                    dict_clusters = {}
 
-                                cluster = dict_clusters[label]
+                                                if label not in dict_clusters:
+                                                    dict_clusters[label] = []
 
-                                cluster.append(arr[i])
+                                                cluster = dict_clusters[label]
 
-                        list0: list = list(dict_clusters.values())
+                                                cluster.append(arr[i])
 
-                        if len(list0) > 1:
-                            chi2, p, dof, expected = run_chi2(list0)
+                                        list0: list = list(dict_clusters.values())
 
-                            if list_chi2 is None:
-                                list_chi2 = []
+                                        if len(list0) > 1:
+                                            if len(tup) > 1 and tup[1] == 1:  # categorical
+                                                chi2, p, dof, expected = run_chi2(list0)
+                                            else:
+                                                f_stat, p = f_oneway(*list0)
 
-                            list_chi2.append({
-                                'column': col,
-                                'chi2': chi2,
-                                'p': p,
-                                'dof': dof,
-                                'expected': expected
-                            })
+                                            if list_stat_test0 is None:
+                                                list_stat_test0 = []
 
-            len_chi2: int = len(list_chi2)
+                                            list_stat_test0.append({
+                                                'column': col,
+                                                'p': p
+                                            })
 
-            if len_chi2 > 0:
-                class_folder = 'output'
+                    len_stat_test0: int = len(list_stat_test0)
 
-                for component in path_components:
-                    if component is not None:
-                        class_folder = os.path.join(class_folder, component)
+                    if len_stat_test0 > 0:
+                        class_folder = 'output'
 
-                        if not os.path.exists(class_folder):
-                            os.makedirs(class_folder)
+                        for component in path_components:
+                            if component is not None:
+                                class_folder = os.path.join(class_folder, component)
 
-                file_name = f'{reducer_display_name}-{clustering_display_name}'
+                                if not os.path.exists(class_folder):
+                                    os.makedirs(class_folder)
 
-                file_name_chi2 = f'{file_name}-chi2.txt'
+                        file_name = f'{reducer_display_name}-{clustering_display_name}'
 
-                class_file_chi2 = os.path.join(class_folder, file_name_chi2)
+                        file_name_stat_test = f'{file_name}-columns-stat-test.txt'
 
-                with open(class_file_chi2, 'w') as fwriter:
-                    fwriter.write('column,chi2,p,dof\n')
+                        class_file_name_stat_test = os.path.join(class_folder, file_name_stat_test)
 
-                    for i in range(len_chi2):
-                        chi2_obj = list_chi2[i]
+                        with open(class_file_name_stat_test, 'w') as fwriter:
+                            fwriter.write('column,p\n')
 
-                        if isinstance(chi2_obj, dict) and len(chi2_obj) > 0:
-                            column = chi2_obj['column'],
-                            chi2 = chi2_obj['chi2'],
-                            p = chi2_obj['p'],
-                            dof = chi2_obj['dof'],
-                            expected = chi2_obj['expected']
+                            for i in range(len_stat_test0):
+                                stat_obj = list_stat_test0[i]
 
-                            str = f'{column},{chi2},{p},{dof}\n'
+                                if isinstance(stat_obj, dict) and len(stat_obj) > 0:
+                                    column = stat_obj['column'],
+                                    p = stat_obj['p'],
 
-                            fwriter.write(str)
+                                    str = f'{column[0]},{p[0]}\n'
+
+                                    fwriter.write(str)
 
     return list_stats, list_stats_test
