@@ -1,20 +1,15 @@
 from dimension_reduction import calculate
 
+list_of_columns: list = [('Age', 0), ('Gender', 1), ('Education_Level', 1), ('Marital_Status', 1),
+                         ('Occupation', 1), ('Income_Level', 1), ('Place_of_Residence', 1),
+                         ('Substance_Use', 1), ('Social_Support', 1), ('Stress_Factors', 1),
+                         ('Family_History_of_Schizophrenia', 1), ('Number_of_Hospitalizations', 0),
+                         ('Disease_Duration', 0)]
+
 
 def main():
     arr_files: list = [
-        (r'ds\sleep_deprivation_dataset_detailed.csv',),
-        (r'ds\Bank_Transaction_Fraud_Detection.csv',),
-        (r'ds\sales_data.csv',),
-        (r'ds\sleep_cycle_productivity.csv',),
-        (r'ds\car_price_dataset.csv',),
-        (r'ds\heart.csv',),
-        (r'ds\cardio_train.csv', ['id'], ';'),
-        (r'ds\cardio_data_processed.csv', ['id'],),
-        (r'ds\alzheimers_disease_data.csv', ['PatientID']),
-        (r'ds\health_data.csv', ['id']),
-        (r'ds\UserCarData.csv', ['Sales_ID'], ',', (2, 40), 'sold'),
-        (r'ds\schizophrenia_dataset.csv', ['Patient_ID'], ',', (2, 10), 'Diagnosis')
+        (r'ds\schizophrenia_dataset.csv', ['Patient_ID'], ',', (8, 10), 'Diagnosis', list_of_columns)
     ]
 
     file_tuple: tuple = arr_files[-1]
@@ -25,6 +20,7 @@ def main():
     k_min = 2
     k_max = 22
     pivot_column: str = None
+    list_columns: list = None
 
     len_file_tuple = len(file_tuple)
 
@@ -47,13 +43,16 @@ def main():
     if len_file_tuple > 4:
         pivot_column = file_tuple[4]
 
+    if len_file_tuple > 5:
+        list_columns = file_tuple[5]
+
     if file_path:
         if file_separator is None:
             file_separator = ','
 
         calculate(file_path, pivot_column=pivot_column, drop_pivot_column=False,
                   columns_to_drop=columns_to_drop, csv_sep=file_separator,
-                  k_min=k_min, k_max=k_max)
+                  k_min=k_min, k_max=k_max, list_of_columns=list_columns)
 
 
 if __name__ == "__main__":

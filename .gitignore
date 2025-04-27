@@ -4,3 +4,5 @@
 *.csv
 !ds/*.csv
 !requirements.txt
+build/
+dist/
