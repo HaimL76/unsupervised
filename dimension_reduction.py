@@ -42,7 +42,7 @@ dimension_reduction_methods = [
 
 
 def calculate(csv_file, pivot_column=None, drop_pivot_column: bool = True, columns_to_drop: list = None,
-              csv_sep=',', k_min=2, k_max=22):
+              csv_sep=',', k_min=2, k_max=22, list_of_columns: list = None):
     if os.path.exists('output'):
         shutil.rmtree('output')
 
@@ -109,7 +109,7 @@ def calculate(csv_file, pivot_column=None, drop_pivot_column: bool = True, colum
     list_stats: list = []
     list_stats_test: list = []
 
-    for reducer_index in range(len_dimension_reduction_methods):
+    for reducer_index in range(2,3):
         opt_cluster_scores, most_optimal_cluster = calculate_dimension_reduction(
             df_original, df_scaled, reducer_index, labels, pivot_column,
             opt_cluster_scores=opt_cluster_scores, most_optimal_cluster=most_optimal_cluster,
@@ -120,7 +120,8 @@ def calculate(csv_file, pivot_column=None, drop_pivot_column: bool = True, colum
 
         _, _ = calculate_statistics_for_clusters(df_original, most_optimal_cluster, [], [],
                                                  path_components=path_components,
-                                                 pivot_column=pivot_column, threshold=0.5)
+                                                 pivot_column=pivot_column, threshold=0.5,
+                                                 list_of_columns=list_of_columns)
 
     clusters_file_path = os.path.join('output', 'clusters.txt')
 
@@ -167,7 +168,8 @@ def calculate(csv_file, pivot_column=None, drop_pivot_column: bool = True, colum
 def calculate_dimension_reduction(
         df_original, df_scaled, reducer_index, labels, pivot_column=None,
         opt_cluster_scores: list = [], most_optimal_cluster=None,
-        k_min=2, k_max=22, list_stats: list = [], list_stats_test: list = []):
+        k_min=2, k_max=22, list_stats: list = [], list_stats_test: list = [],
+        list_of_columns: list = None):
     num_comps = 2
 
     # Run dimension reduce
@@ -201,7 +203,7 @@ def calculate_dimension_reduction(
             reducer_display_name=reducer_display_name,
             opt_cluster_scores=opt_cluster_scores,
             list_stats=list_stats, list_stats_test=list_stats_test,
-        pivot_column=pivot_column)
+            pivot_column=pivot_column, list_of_columns=list_of_columns)
 
         if isinstance(opt_cluster_scores, list) and len(opt_cluster_scores) > 0:
             new_opt_score = opt_cluster_scores[-1]

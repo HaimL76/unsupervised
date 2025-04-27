@@ -33,7 +33,7 @@ p_value_threshold = 0.05
 def calculate_statistics_for_clusters(df, entry, list_stats: list, list_stats_test: list,
                                       path_components: list = ['classification'],
                                       pivot_column: str = None, threshold: float = None,
-                                      target_column: str = None):
+                                      target_column: str = None, list_of_columns: list = None):
     cluster_labels = entry['opt_labels']
     num_clusters = entry['opt_k']
     reducer_display_name = entry['reducer_display_name']
@@ -116,7 +116,9 @@ def calculate_statistics_for_clusters(df, entry, list_stats: list, list_stats_te
                                                                                          target_column='Suicide_Attempt',
                                                                                          path_components=[
                                                                                              'classification',
-                                                                                             'highest-score-cluster'])
+                                                                                             'highest-score-cluster'],
+                                                                                         list_of_columns=list_of_columns
+                                                                                         )
 
     return list_stats, list_stats_test
 
@@ -172,7 +174,8 @@ def calculate_statistics_on_clusters_by_target(df, entry, pivot_column, pivot_va
                                                list_stats: list = [],
                                                list_stats_test: list = [],
                                                target_column: str = None,
-                                               path_components: list = None):
+                                               path_components: list = None,
+                                               list_of_columns: list = None):
     cluster_labels = entry['opt_labels']
     num_clusters = entry['opt_k']
     reducer_display_name = entry['reducer_display_name']
@@ -270,13 +273,10 @@ def calculate_statistics_on_clusters_by_target(df, entry, pivot_column, pivot_va
                 if can_check_columns:
                     list_stat_test0: list = None
 
-                    list_of_columns: list = [('Age', 0), ('Gender', 1), ('Education_Level', 1), ('Marital_Status', 1),
-                                             ('Occupation', 1), ('Income_Level', 1), ('Place_of_Residence', 1),
-                                             ('Substance_Use', 1), ('Social_Support', 1), ('Stress_Factors', 1),
-                                             ('Family_History_of_Schizophrenia', 1), ('Number_of_Hospitalizations', 0),
-                                             ('Disease_Duration', 0)]
+                    len_columns: int = 0
 
-                    len_columns: int = len(list_of_columns)
+                    if isinstance(list_of_columns, list):
+                        len_columns = len(list_of_columns)
 
                     if len_columns > 0:
                         for tup in list_of_columns:
@@ -321,7 +321,10 @@ def calculate_statistics_on_clusters_by_target(df, entry, pivot_column, pivot_va
                                                 'p': p
                                             })
 
-                    len_stat_test0: int = len(list_stat_test0)
+                    len_stat_test0: int = 0
+
+                    if isinstance(list_stat_test0, list):
+                        len_stat_test0 = len(list_stat_test0)
 
                     if len_stat_test0 > 0:
                         class_folder = 'output'
